@@ -1,49 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { translateClinicalText } from '../../utils/clinicalTranslator';
 import { 
   Mic, 
   MicOff, 
   Volume2, 
-  VolumeX, 
   Languages, 
   ArrowRightLeft, 
   Sparkles, 
-  Check, 
-  MessageSquare,
   Zap,
-  CornerDownRight
+  CornerDownRight,
+  RefreshCw,
+  CheckCircle2
 } from 'lucide-react';
 
 const COMMON_DOCTOR_PHRASES = [
   {
+    en: "Can you tell me what's your problem and where you feel the pain?",
+    ml: "എന്താണ് പ്രശ്നമെന്നും എവിടെയാണ് വേദനയെന്നും പറയാമോ?",
+  },
+  {
     en: "Where does it hurt?",
     ml: "എവിടെയാണ് വേദന അനുഭവപ്പെടുന്നത്?",
-    hi: "आपको दर्द कहाँ हो रहा है?",
-    bn: "আপনার কোথায় ব্যথা হচ্ছে?"
   },
   {
     en: "How many days have you had this fever?",
     ml: "എത്ര ദിവസമായി ഈ പനിയുണ്ട്?",
-    hi: "यह बुखार आपको कितने दिनों से है?",
-    bn: "এই জ্বর আপনার কতদিন ধরে রয়েছে?"
   },
   {
     en: "Take this tablet after food three times a day.",
     ml: "ഈ ഗുളിക ഭക്ഷണത്തിന് ശേഷം ദിവസവും മൂന്ന് നേരം കഴിക്കുക.",
-    hi: "यह गोली दिन में तीन बार खाना खाने के बाद लें।",
-    bn: "এই ট্যাবলেটটি দিনে তিনবার খাবার খাওয়ার পর খাবেন।"
   },
   {
     en: "Do you have any allergy to penicillin or injections?",
     ml: "നിങ്ങൾക്ക് പെൻസിലിനോ കുത്തിവെയ്പ്പിനോ അലർജിയുണ്ടോ?",
-    hi: "क्या आपको पेनिसिलिन या इंजेक्शन से कोई एलर्जी है?",
-    bn: "আপনার কি পেনিসিলিন বা ইঞ্জেকশনে কোনো অ্যালার্জি আছে?"
   },
   {
     en: "Drink boiled warm water and take two days rest.",
     ml: "തിളപ്പിച്ചാറിയ ചെറുചൂടുവെള്ളം കുടിക്കുകയും രണ്ട് ദിവസം വിശ്രമിക്കുകയും ചെയ്യുക.",
-    hi: "उबला हुआ गुनगुना पानी पिएं और दो दिन पूरा आराम करें।",
-    bn: "ফোটানো হালকা গরম জল খান এবং দুই দিন বিশ্রাম নিন।"
   }
 ];
 
@@ -51,20 +45,14 @@ const COMMON_WORKER_PHRASES = [
   {
     hi: "मुझे 2 दिन से तेज़ बुखार और गले में दर्द है।",
     bn: "আমার ২ দিন ধরে প্রচণ্ড জ্বর এবং গলায় ব্যথা হচ্ছে।",
-    en: "I have had high fever and throat pain for 2 days.",
-    ml: "എനിക്ക് 2 ദിവസമായി കടുത്ത പനിയും തൊണ്ടവേദനയുമുണ്ട്."
   },
   {
     hi: "प्लाईवुड फैक्ट्री में धूल की वजह से सांस लेने में दिक्कत होती है।",
     bn: "প্লাইউড কারখানার ধুলোর কারণে শ্বাস নিতে কষ্ট হয়।",
-    en: "I have difficulty breathing due to dust in the plywood factory.",
-    ml: "പ്ലൈവുഡ് ഫാക്ടറിയിലെ പൊടി കാരണം എനിക്ക് ശ്വാസമെടുക്കാൻ ബുദ്ധിമുട്ടാണ്."
   },
   {
     hi: "मुझे पेनिसिलिन इंजेक्शन से एलर्जी है।",
     bn: "আমার পেনিসিলিন ইঞ্জেকশনে অ্যালার্জি আছে।",
-    en: "I am allergic to penicillin injections.",
-    ml: "എനിക്ക് പെൻസിലിൻ കുത്തിവെയ്പ്പ് അലർജിയാണ്."
   }
 ];
 
@@ -76,8 +64,9 @@ export const DoctorVoiceTranslator = () => {
   const [doctorLang, setDoctorLang] = useState('en'); // 'en' | 'ml'
   const [workerLang, setWorkerLang] = useState(selectedPatient?.audioLanguage || 'hi'); // 'hi' | 'bn'
   
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("Can you tell me what's your problem and where you feel the pain?");
   const [translatedText, setTranslatedText] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
@@ -88,44 +77,29 @@ export const DoctorVoiceTranslator = () => {
     }
   }, [selectedPatient]);
 
-  // Translate text helper
-  const handleTranslateAndSpeak = (text, sourceDirection = direction) => {
-    if (!text || !text.trim()) return;
-    setInputText(text);
+  // Translate and speak helper
+  const handleTranslateAndSpeak = async (textToTranslate = inputText) => {
+    if (!textToTranslate || !textToTranslate.trim()) return;
+    setIsTranslating(true);
+    setInputText(textToTranslate);
 
-    let output = '';
-    let targetLangCode = 'hi-IN';
+    const sourceLang = direction === 'doctor_to_worker' ? doctorLang : workerLang;
+    const targetLang = direction === 'doctor_to_worker' ? workerLang : doctorLang;
 
-    if (sourceDirection === 'doctor_to_worker') {
-      // Doctor -> Worker
-      const matched = COMMON_DOCTOR_PHRASES.find(
-        (p) => p.en.toLowerCase() === text.toLowerCase() || p.ml === text
-      );
-      if (matched) {
-        output = matched[workerLang] || matched.hi;
-      } else {
-        // Simple contextual clinical dictionary
-        output = workerLang === 'bn' 
-          ? `ডাক্তারের নির্দেশ: ${text}` 
-          : `डॉक्टर का निर्देश: ${text}`;
-      }
-      targetLangCode = workerLang === 'bn' ? 'bn-IN' : 'hi-IN';
-    } else {
-      // Worker -> Doctor
-      const matched = COMMON_WORKER_PHRASES.find(
-        (p) => p.hi === text || p.bn === text
-      );
-      if (matched) {
-        output = doctorLang === 'ml' ? matched.ml : matched.en;
-      } else {
-        output = doctorLang === 'ml' ? `രോഗി പറയുന്നു: ${text}` : `Patient reports: ${text}`;
-      }
-      targetLangCode = doctorLang === 'ml' ? 'ml-IN' : 'en-IN';
-    }
+    // Actual Translation via Clinical Translator Engine
+    const translated = await translateClinicalText(textToTranslate, sourceLang, targetLang);
+    setTranslatedText(translated);
+    setIsTranslating(false);
 
-    setTranslatedText(output);
-    speakText(output, 'translator', targetLangCode);
+    // Speak in native BCP-47 target language
+    const targetBcp47 = targetLang === 'ml' ? 'ml-IN' : targetLang === 'bn' ? 'bn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
+    speakText(translated, 'translator', targetBcp47);
   };
+
+  // Run initial translation on mount
+  useEffect(() => {
+    handleTranslateAndSpeak("Can you tell me what's your problem and where you feel the pain?");
+  }, [workerLang, doctorLang, direction]);
 
   // Web Speech Recognition for Live Mic
   const toggleSpeechRecognition = () => {
@@ -139,7 +113,6 @@ export const DoctorVoiceTranslator = () => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      // Fallback: pick the first sample
       const sample = direction === 'doctor_to_worker' 
         ? (doctorLang === 'ml' ? COMMON_DOCTOR_PHRASES[0].ml : COMMON_DOCTOR_PHRASES[0].en)
         : (workerLang === 'bn' ? COMMON_WORKER_PHRASES[0].bn : COMMON_WORKER_PHRASES[0].hi);
@@ -184,9 +157,12 @@ export const DoctorVoiceTranslator = () => {
   };
 
   const handleSwapDirection = () => {
-    setDirection(direction === 'doctor_to_worker' ? 'worker_to_doctor' : 'doctor_to_worker');
-    setInputText('');
-    setTranslatedText('');
+    const nextDir = direction === 'doctor_to_worker' ? 'worker_to_doctor' : 'doctor_to_worker';
+    setDirection(nextDir);
+    const newSample = nextDir === 'doctor_to_worker' 
+      ? (doctorLang === 'ml' ? COMMON_DOCTOR_PHRASES[0].ml : COMMON_DOCTOR_PHRASES[0].en)
+      : (workerLang === 'bn' ? COMMON_WORKER_PHRASES[0].bn : COMMON_WORKER_PHRASES[0].hi);
+    handleTranslateAndSpeak(newSample);
   };
 
   return (
@@ -196,14 +172,11 @@ export const DoctorVoiceTranslator = () => {
         <div>
           <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 text-xs font-bold uppercase tracking-wider mb-1">
             <Languages className="w-3.5 h-3.5" />
-            <span>Real-Time Clinical Audio Bridge</span>
+            <span>2-Way Real-Time Voice Translator</span>
           </div>
           <h2 className="text-base sm:text-lg font-bold text-slate-900">
-            {t('docTranslatorTitle')}
+            Doctor speaks English/Malayalam ↔ Patient hears Hindi/Bengali
           </h2>
-          <p className="text-xs text-slate-500">
-            {t('docTranslatorSub')}
-          </p>
         </div>
 
         {/* Direction Switch Toggle */}
@@ -278,30 +251,31 @@ export const DoctorVoiceTranslator = () => {
 
       {/* Main Translation Mic & Visual Display */}
       <div className="p-4 md:p-5 rounded-xl bg-slate-900 text-white space-y-4 shadow-sm border border-slate-800">
-        {/* Source Text Input / Speech Bar */}
+        {/* Source Text Input */}
         <div className="space-y-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-            {direction === 'doctor_to_worker' ? t('docDoctorSpeaks') : t('docWorkerSpeaks')}:
+            {direction === 'doctor_to_worker' ? `Doctor Speaks (${doctorLang.toUpperCase()})` : `Patient Speaks (${workerLang.toUpperCase()})`}:
           </span>
           <div className="flex items-center gap-2">
             <input
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder={direction === 'doctor_to_worker' ? "Type doctor instructions or click voice mic below..." : "Patient speech transcript..."}
+              onKeyDown={(e) => e.key === 'Enter' && handleTranslateAndSpeak(inputText)}
+              placeholder="Type clinical question or click voice mic below..."
               className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal-400"
             />
             <button
               type="button"
               onClick={() => handleTranslateAndSpeak(inputText)}
-              className="px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 font-bold text-xs uppercase"
+              className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 font-bold text-xs uppercase transition-colors"
             >
-              Translate
+              {isTranslating ? 'Translating...' : 'Translate'}
             </button>
           </div>
         </div>
 
-        {/* Central Live Mic Trigger */}
+        {/* Central Voice Mic Button */}
         <div className="flex flex-col items-center justify-center py-2 space-y-2">
           <button
             type="button"
@@ -315,40 +289,48 @@ export const DoctorVoiceTranslator = () => {
             {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
           </button>
           <span className="text-xs text-slate-300 font-semibold">
-            {isListening ? "Listening live to speech..." : t('docSpeakMic')}
+            {isListening ? "Listening live to clinical speech..." : "Hold to Speak (Voice Mic)"}
           </span>
         </div>
 
-        {/* Translated Output Card */}
+        {/* Live Translated Speech Card (ACTUAL HINDI / BENGALI / MALAYALAM) */}
         {translatedText && (
-          <div className="p-3.5 rounded-lg bg-slate-800/90 border border-teal-500/50 space-y-2">
+          <div className="p-4 rounded-lg bg-slate-800/90 border border-teal-500/50 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-teal-300 uppercase tracking-wider flex items-center space-x-1">
-                <Sparkles className="w-3 h-3 text-amber-400" />
-                <span>Live Translated Speech Audio ({direction === 'doctor_to_worker' ? workerLang.toUpperCase() : doctorLang.toUpperCase()}):</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>
+                  Live Translated Speech Audio ({direction === 'doctor_to_worker' ? (workerLang === 'bn' ? 'BENGALI (BN)' : 'HINDI (HI)') : (doctorLang === 'ml' ? 'MALAYALAM (ML)' : 'ENGLISH (EN)')}):
+                </span>
               </span>
 
               <button
                 type="button"
-                onClick={() => speakText(translatedText, 'translator', direction === 'doctor_to_worker' ? (workerLang === 'bn' ? 'bn-IN' : 'hi-IN') : (doctorLang === 'ml' ? 'ml-IN' : 'en-IN'))}
-                className="inline-flex items-center space-x-1 text-xs font-bold text-amber-300 hover:text-amber-200"
+                onClick={() => {
+                  const targetBcp47 = (direction === 'doctor_to_worker')
+                    ? (workerLang === 'bn' ? 'bn-IN' : 'hi-IN')
+                    : (doctorLang === 'ml' ? 'ml-IN' : 'en-IN');
+                  speakText(translatedText, 'translator', targetBcp47);
+                }}
+                className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded bg-teal-900/60 hover:bg-teal-900 text-xs font-bold text-amber-300 transition-colors"
               >
                 <Volume2 className="w-3.5 h-3.5" />
                 <span>Play Audio Again</span>
               </button>
             </div>
 
-            <p className="text-sm md:text-base font-bold text-white leading-relaxed">
+            {/* Exact Actual Translated Speech Text */}
+            <p className="text-base sm:text-lg font-black text-amber-300 leading-relaxed font-sans">
               "{translatedText}"
             </p>
           </div>
         )}
       </div>
 
-      {/* Fast 1-Click Clinical Phrases */}
+      {/* 1-Click Fast Clinical Triage Prompts */}
       <div>
         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-          ⚡ 1-Click Common Clinical Triage Phrases:
+          ⚡ 1-Click Clinical Dialogue Prompts:
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {direction === 'doctor_to_worker' ? (
