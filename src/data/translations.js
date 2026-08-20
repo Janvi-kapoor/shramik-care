@@ -1,0 +1,676 @@
+/**
+ * ShramikCare - Multilingual Translation Dictionary (Enterprise Edition)
+ * Languages: English (en), Hindi (hi), Bengali (bn), Malayalam (ml)
+ */
+
+export const TRANSLATIONS = {
+  en: {
+    // Brand & Header
+    brandName: "ShramikCare",
+    brandTagline: "Interstate Migrant Digital Health Bridge",
+    govtBadge: "Govt. of Kerala • Dept. of Labour & Health Initiative",
+    portalLogin: "Portal Login",
+    navHome: "Home",
+    navCamps: "Health Camps",
+    navFeatures: "Capabilities",
+    navEmergency: "24x7 Helpline: 1056",
+    languageSelect: "Language",
+    activeSession: "Active Session",
+    signOut: "Sign Out",
+    backToHome: "Landing Page",
+    workerDashboard: "Worker Health Bridge",
+    doctorWorkstation: "KMC Doctor Clinical Workstation",
+
+    // Hero Section
+    heroBadge: "Kerala Migrant Health Ecosystem (KMHE) • God's Own Country",
+    heroTitlePrefix: "Bridging Healthcare & Welfare for",
+    heroTitleHighlight: "Kerala’s Guest Workforce",
+    heroSubtitle: "Portable digital health records, 14-digit ABHA ID integration, and zero-friction AWAZ insurance linkage.",
+    ctaEnroll: "1-Min Camp Enrollment",
+    ctaQuickAccess: "Portal Quick Access",
+    ctaDoctorPortal: "Doctor & KMC Access",
+    heroTrust: "Trusted by over 35,000+ guest workers across Ernakulam, Perumbavoor, Kozhikode & Kannur hubs.",
+
+    // Metrics
+    metricWorkersTitle: "Registered Guest Workers",
+    metricWorkersTag: "↗ 12% This Month",
+    metricWorkersSub: "Enrolled in Digital Passport",
+    metricCampsTitle: "Active Health Camps",
+    metricCampsTag: "⚠ 3 High-Risk Zones",
+    metricCampsSub: "Mobile Triage & Outreach Units",
+    metricAwazTitle: "AWAZ Claims Settled",
+    metricAwazTag: "✓ 100% Cashless",
+    metricAwazSub: "Total Health & Accidental Aid",
+
+    // Capabilities
+    campsHeading: "Live Kerala Health Camps & Hubs",
+    campsSub: "Real-time field camps deployed across major migrant workforce clusters today.",
+    campStatusActive: "Active Today",
+
+    // Auth Modal
+    authModalTitle: "ShramikCare Multi-Role Portal",
+    authModalSubtitle: "Select your role to access digital health records or enroll guest workers.",
+    tabWorker: "Worker",
+    tabDoctor: "Doctor",
+    tabAdmin: "Govt Admin",
+    tabRegister: "1-Min Camp Enrollment",
+    loginHeadingWorker: "Guest Worker Login",
+    loginSubWorker: "Login using your registered mobile number or KL-MIG Health ID.",
+    loginHeadingDoctor: "Doctor & Medical Staff Login",
+    loginSubDoctor: "Authorized Kerala Medical Council (KMC) verified portal.",
+    loginHeadingAdmin: "Department Nodal Officer Login",
+    loginSubAdmin: "Kerala State Labour & Health Administrative Console.",
+    demoQuickLogin: "Quick Demo One-Click Access:",
+
+    // Worker Login Fields
+    btnWorkerLogin: "Verify & Enter Portal",
+    btnDoctorLogin: "Verify KMC License & Login",
+    btnAdminLogin: "Authenticate Officer Access",
+    btnDemoRamesh: "Demo Login: Ramesh Kumar (Bihar)",
+    btnDemoBikash: "Demo Login: Bikash Mondal (WB)",
+    btnDemoDoctor: "Demo Login: Dr. P.K. Thomas (Aluva PHC)",
+    btnDemoAdmin: "Demo Login: Rajesh V. IAS",
+
+    // Kiosk & Registration
+    kioskGateTitle: "Camp Volunteer Authorization",
+    inputKioskPinPlaceholder: "Enter 4-digit PIN (Demo: 1234)",
+    btnUnlockKiosk: "Authorize & Open Enrollment Kiosk",
+    wizardTitle: "Guest Worker 1-Minute Camp Enrollment",
+    step1Title: "Personal Details",
+    step2Title: "Worksite & Contact",
+    step3Title: "Medical Baseline & ABHA",
+    stepSubmit: "Complete Enrollment & Generate Passport",
+
+    // Worker Dashboard Tabs
+    dashTabPassport: "Health Pass",
+    dashTabScanner: "AI Scanner",
+    dashTabPills: "Pill-Clock",
+    dashTabWallet: "Welfare",
+
+    // Tab 1: Passport & SOS
+    passportTitle: "Digital Health Passport",
+    emergencySosTitle: "Emergency SOS Rapid Action",
+    sosDishaLabel: "DISHA Medical Helpline",
+    sosAmbulanceLabel: "Emergency Ambulance",
+    sosLabourLabel: "Labour Dept Help",
+    vitalsTitle: "Recent Health Screening Vitals",
+    vitalsBp: "Blood Pressure",
+    vitalsSugar: "Blood Sugar",
+    vitalsPulse: "Pulse Rate",
+    vitalsSpo2: "Oxygen (SpO2)",
+    campCheckupTitle: "Last Camp Medical Assessment",
+
+    // Tab 2: AI Scanner
+    scannerHeaderTitle: "Live AI Prescription Scanner",
+    scannerHeaderSub: "Instant drug identification, AWAZ scheme check, and Jan Aushadhi generic matching.",
+    scannerInstruction: "Point camera at doctor's prescription or choose a demo slip below.",
+    btnUploadRxFallback: "Upload Prescription Photo",
+    resultDiagnosis: "Detected Clinical Diagnosis:",
+    awazFreeTag: "✅ 100% Free under Kerala AWAZ Scheme",
+    awazFreeDesc: "This clinical condition and required consultations are covered with zero out-of-pocket cost at empanelled Kerala hospitals.",
+    btnFindAwazHospitals: "🏥 Find AWAZ Hospitals in",
+    janAushadhiTitle: "Jan Aushadhi Generic Savings Matcher",
+    youSaveBadge: "You Save",
+    btnFindJanAushadhi: "💊 Find Jan Aushadhi Stores in",
+    btnSyncToPillClock: "⏰ Add Medicines to Voice Pill-Clock",
+
+    // Tab 3: Pill-Clock
+    pillClockTitle: "Daily Multilingual Voice Pill-Clock",
+    pillClockSub: "Zero-confusion medicine schedule with native voice guidance.",
+    btnPlayAllDoses: "🔊 Speak Full Daily Schedule",
+    btnPlaySlotAudio: "🔊 Play Audio Guidance",
+    audioPlayingState: "Speaking Now...",
+    btnMarkDoseTaken: "Dose Taken ✓",
+    btnDoseCompleted: "Taken Today 🎉",
+    adherenceProgress: "Today's Medicine Adherence:",
+
+    // Tab 4: Wallet
+    walletTitle: "Kerala Migrant Welfare & AWAZ Wallet",
+    walletSub: "Cashless medical cover, accident insurance, and state welfare schemes.",
+    awazCardLinkedTitle: "AWAZ Smart Health Card Active",
+    awazCardUnlinkedTitle: "AWAZ Card Pending Verification",
+    awazLimitTitle: "Annual Cashless Health Limit",
+    awazAvailableBalance: "Available Balance",
+    awazUtilized: "Utilized for Care",
+    recentClaimsTitle: "Recent Cashless Claims History",
+    claimHospital: "Aluva Taluk Hospital (General OPD & Labs)",
+    otherSchemesTitle: "Kerala State Migrant Welfare Schemes",
+
+    // Modals
+    hospitalsModalTitle: "Empanelled AWAZ Hospitals in",
+    hospitalsModalSub: "Cashless emergency care and specialized triage for guest workers.",
+    janAushadhiModalTitle: "PM Jan Aushadhi Generic Pharmacies in",
+    janAushadhiModalSub: "Government stores offering up to 90% cheaper certified medicines.",
+    callHospital: "Call Desk",
+    getDirections: "View Map",
+    cashlessCoveredBadge: "100% Cashless AWAZ Desk",
+    filterNotice: "Strictly filtered for your active work district:",
+
+    // Alerts
+    alertLoginSuccess: "Welcome back! Logged in as",
+    alertRegisterSuccess: "Worker enrolled successfully with new Health ID:",
+    alertAuthFailed: "Invalid credentials. Please check your inputs or use the quick demo buttons.",
+    alertAbhaGenerated: "14-digit ABHA ID successfully generated and linked!",
+    alertRxAddedToPills: "Prescription medicines synced to your Voice Pill-Clock!",
+    alertAwazLinked: "AWAZ Card verified! ₹50,000 cashless ledger is active.",
+
+    // DOCTOR WORKSTATION SPECIFIC
+    docWsTitle: "KMC Doctor Clinical Workstation",
+    docWsSub: "Kerala Medical Council Verified Medical Triage & Translation Hub",
+    docLookupTitle: "1-Second Patient Lookup",
+    docLookupSub: "Scan QR code or search patient to load verified medical history.",
+    docAllergyAlert: "CRITICAL DRUG ALLERGY WARNING",
+    docTranslatorTitle: "2-Way Real-Time Voice Translator",
+    docTranslatorSub: "Doctor speaks English/Malayalam ↔ Patient hears Hindi/Bengali.",
+    docDoctorSpeaks: "Doctor Speaks (Malayalam / English)",
+    docWorkerSpeaks: "Patient Speaks (Hindi / Bengali)",
+    docSpeakMic: "Hold to Speak",
+    docPlayTranslated: "🔊 Speak Translated Voice",
+    docPrescribeBtn: "Write Digital Prescription",
+    docMedicalTimeline: "Unified Medical Timeline & Vitals",
+    docNoAllergies: "No Known Drug Allergies (NKDA)",
+
+    // Footer
+    footerGovtTitle: "Government of Kerala",
+    footerDept: "Department of Labour and Skills & Directorate of Health Services",
+    footerHelplineTitle: "Emergency & Migrant Support Helplines:",
+    footerDisha: "DISHA Health Helpline: 1056 (Toll-Free)",
+    footerAwaz: "AWAZ Scheme Support: 1800-425-1147",
+    footerLabour: "Labour Help Desk: 155214"
+  },
+
+  hi: {
+    // Brand & Header
+    brandName: "श्रमिककेयर (ShramikCare)",
+    brandTagline: "अंतरराज्यीय प्रवासी डिजिटल स्वास्थ्य सेतु",
+    govtBadge: "केरल सरकार • श्रम एवं स्वास्थ्य विभाग की संयुक्त पहल",
+    portalLogin: "पोर्टल लॉगिन",
+    navHome: "होम",
+    navCamps: "स्वास्थ्य शिविर",
+    navFeatures: "सुविधाएं",
+    navEmergency: "24x7 हेल्पलाइन: 1056",
+    languageSelect: "भाषा",
+    activeSession: "सक्रिय सत्र",
+    signOut: "लॉगआउट",
+    backToHome: "मुख्य पृष्ठ",
+    workerDashboard: "श्रमिक स्वास्थ्य पोर्टल",
+    doctorWorkstation: "डॉक्टर क्लिनिकल वर्कस्टेशन",
+
+    // Hero Section
+    heroBadge: "केरल प्रवासी स्वास्थ्य तंत्र • ईश्वर का अपना घर (Kerala)",
+    heroTitlePrefix: "केरल के अतिथि श्रमिकों के लिए",
+    heroTitleHighlight: "स्वास्थ्य एवं कल्याण डिजिटल सेतु",
+    heroSubtitle: "डिजिटल स्वास्थ्य रिकॉर्ड, 14-अंकों का आभा (ABHA) आईडी, और आवाज़ (AWAZ) बीमा योजना का सीधा लाभ।",
+    ctaEnroll: "1-मिनट कैंप पंजीकरण",
+    ctaQuickAccess: "पोर्टल क्विक एक्सेस",
+    ctaDoctorPortal: "डॉक्टर व केएमसी पोर्टल",
+    heroTrust: "पेरुम्बावूर, एर्नाकुलम, कोझीकोड और कन्नूर में 35,000+ अतिथि श्रमिकों द्वारा विश्वसनीय।",
+
+    // Metrics
+    metricWorkersTitle: "पंजीकृत अतिथि श्रमिक",
+    metricWorkersTag: "↗ 12% इस माह वृद्धि",
+    metricWorkersSub: "डिजिटल हेल्थ पासपोर्ट में पंजीकृत",
+    metricCampsTitle: "सक्रिय स्वास्थ्य शिविर",
+    metricCampsTag: "⚠ 3 उच्च जोखिम क्षेत्र",
+    metricCampsSub: "मोबाइल जांच एवं आउटरीच दल",
+    metricAwazTitle: "आवाज़ (AWAZ) क्लेम स्वीकृत",
+    metricAwazTag: "✓ 100% कैशलेस इलाज",
+    metricAwazSub: "कुल स्वास्थ्य व दुर्घटना सहायता",
+
+    // Capabilities
+    campsHeading: "केरल के लाइव स्वास्थ्य शिविर व केंद्र",
+    campsSub: "श्रमिक बस्तियों और औद्योगिक क्षेत्रों में आज संचालित चिकित्सा केंद्र।",
+    campStatusActive: "आज सक्रिय",
+
+    // Auth
+    authModalTitle: "श्रमिककेयर बहु-भूमिका पोर्टल",
+    authModalSubtitle: "डिजिटल स्वास्थ्य रिकॉर्ड देखने या नए श्रमिक को पंजीकृत करने के लिए भूमिका चुनें।",
+    tabWorker: "श्रमिक",
+    tabDoctor: "चिकित्सक",
+    tabAdmin: "सरकारी नोडल",
+    tabRegister: "1-मिनट कैंप पंजीकरण",
+    loginHeadingWorker: "अतिथि श्रमिक लॉगिन",
+    loginSubWorker: "अपने पंजीकृत मोबाइल नंबर या KL-MIG हेल्थ आईडी से प्रवेश करें।",
+    loginHeadingDoctor: "चिकित्सक एवं स्टाफ लॉगिन",
+    loginSubDoctor: "केरल मेडिकल काउंसिल (KMC) अधिकृत सुरक्षित पोर्टल।",
+    loginHeadingAdmin: "श्रम व स्वास्थ्य नोडल अधिकारी लॉगिन",
+    loginSubAdmin: "केरल राज्य प्रशासनिक नियंत्रण कंसोल।",
+    demoQuickLogin: "एक-क्लिक त्वरित डेमो लॉगिन:",
+
+    // Worker Login Fields
+    btnWorkerLogin: "सत्यापित करें और प्रवेश करें",
+    btnDoctorLogin: "लाइसेंस जांचें व लॉगिन करें",
+    btnAdminLogin: "अधिकारी पहचान सत्यापित करें",
+    btnDemoRamesh: "डेमो लॉगिन: रमेश कुमार (बिहार)",
+    btnDemoBikash: "डेमो लॉगिन: विकास मोंडल (प. बंगाल)",
+    btnDemoDoctor: "डेमो लॉगिन: डॉ. पी.के. थॉमस (अलुवा)",
+    btnDemoAdmin: "डेमो लॉगिन: राजेश वी. आईएएस",
+
+    // Tabs
+    dashTabPassport: "हेल्थ पास",
+    dashTabScanner: "एआई स्कैनर",
+    dashTabPills: "दवा घंटी",
+    dashTabWallet: "कल्याण बीमा",
+
+    // Tab 1: Passport & SOS
+    passportTitle: "डिजिटल स्वास्थ्य पासपोर्ट",
+    emergencySosTitle: "आपातकालीन त्वरित सहायता (SOS)",
+    sosDishaLabel: "दिशा चिकित्सा हेल्पलाइन",
+    sosAmbulanceLabel: "एम्बुलेंस सेवा",
+    sosLabourLabel: "श्रम विभाग हेल्पलाइन",
+    vitalsTitle: "हालिया स्वास्थ्य जांच विवरण",
+    vitalsBp: "रक्तचाप (BP)",
+    vitalsSugar: "शुगर स्तर",
+    vitalsPulse: "नाड़ी गति",
+    vitalsSpo2: "ऑक्सीजन स्तर",
+    campCheckupTitle: "पिछला मेडिकल कैंप चेकअप",
+
+    // Tab 2: Scanner
+    scannerHeaderTitle: "लाइव एआई पर्ची स्कैनर",
+    scannerHeaderSub: "डॉक्टर की पर्ची से दवा पहचान, आवाज़ योजना व जन औषधि बचत खोजें।",
+    scannerInstruction: "कैमरे को डॉक्टर की लिखी पर्ची पर सीधा रखें या डेमो पर्ची चुनें।",
+    btnUploadRxFallback: "पर्ची की फोटो अपलोड करें",
+    resultDiagnosis: "पहचानी गई बीमारी / लक्षण:",
+    awazFreeTag: "✅ केरल आवाज़ योजना में 100% मुफ्त इलाज",
+    awazFreeDesc: "यह बीमारी और उपचार केरल के सूचीबद्ध अस्पतालों में पूरी तरह मुफ्त व कैशलेस है।",
+    btnFindAwazHospitals: "🏥 आवाज़ अस्पताल खोजें - जिला:",
+    janAushadhiTitle: "जन औषधि जेनेरिक बचत मिलान",
+    youSaveBadge: "आपकी कुल बचत",
+    btnFindJanAushadhi: "💊 जन औषधि केंद्र खोजें - जिला:",
+    btnSyncToPillClock: "⏰ दवा घंटी (अलार्म) में जोड़ें",
+
+    // Tab 3: Pills
+    pillClockTitle: "बहुभाषी वॉयस दवा घंटी (पिल-क्लॉक)",
+    pillClockSub: "चित्रों और अपनी भाषा में बोलकर दवा याद दिलाने वाली घड़ी।",
+    btnPlayAllDoses: "🔊 आज की पूरी दवा सूची सुनें",
+    btnPlaySlotAudio: "🔊 आवाज में सुनें",
+    audioPlayingState: "आवाज चल रही है...",
+    btnMarkDoseTaken: "दवा ले ली ✓",
+    btnDoseCompleted: "आज ले ली गई 🎉",
+    adherenceProgress: "आज की दवा लेने की स्थिति:",
+
+    // Tab 4: Wallet
+    walletTitle: "केरल प्रवासी कल्याण व आवाज़ वॉलेट",
+    walletSub: "कैशलेस मेडिकल कवर, दुर्घटना सहायता एवं सरकारी योजनाएं।",
+    awazCardLinkedTitle: "आवाज़ स्मार्ट कार्ड सक्रिय है",
+    awazCardUnlinkedTitle: "आवाज़ कार्ड सत्यापन बाकी है",
+    awazLimitTitle: "वार्षिक कैशलेस उपचार सीमा",
+    awazAvailableBalance: "उपलब्ध बैलेंस",
+    awazUtilized: "उपचार में प्रयुक्त",
+    recentClaimsTitle: "हालिया कैशलेस क्लेम रिकॉर्ड",
+    claimHospital: "अलुवा तालुक अस्पताल (ओपीडी व जांच)",
+    otherSchemesTitle: "केरल राज्य प्रवासी कल्याण योजनाएं",
+
+    // Modals
+    hospitalsModalTitle: "आवाज़ अनुबंधित अस्पताल - जिला:",
+    hospitalsModalSub: "अतिथि श्रमिकों के लिए मुफ्त आपातकालीन व ओपीडी चिकित्सा केंद्र।",
+    janAushadhiModalTitle: "सरकारी जन औषधि केंद्र - जिला:",
+    janAushadhiModalSub: "प्रमाणित गुणवत्ता वाली सस्ती जेनेरिक दवा दुकानें।",
+    callHospital: "कॉल करें",
+    getDirections: "रास्ता देखें",
+    cashlessCoveredBadge: "100% कैशलेस आवाज़ हेल्पडेस्क",
+    filterNotice: "आपके कार्यरत जिले के अनुसार फ़िल्टर किया गया:",
+
+    // Alerts
+    alertLoginSuccess: "स्वागत है! सफलतापूर्वक लॉगिन हुआ:",
+    alertRegisterSuccess: "श्रमिक का नया हेल्थ आईडी सफलतापूर्वक बना:",
+    alertAuthFailed: "लॉगिन विवरण अमान्य है। कृपया इनपुट जांचें या डेमो बटन का उपयोग करें।",
+    alertAbhaGenerated: "14-अंकीय आभा आईडी सफलतापूर्वक तैयार कर लिंक कर दी गई!",
+    alertRxAddedToPills: "पर्ची की दवाएं आपकी वॉयस दवा घंटी में जोड़ दी गई हैं!",
+    alertAwazLinked: "आवाज़ कार्ड सत्यापित! ₹50,000 कैशलेस सुविधा सक्रिय है।",
+
+    // DOCTOR WORKSTATION SPECIFIC
+    docWsTitle: "केएमसी डॉक्टर क्लिनिकल वर्कस्टेशन",
+    docWsSub: "केरल मेडिकल काउंसिल अधिकृत मेडिकल ट्रायज एवं अनुवाद केंद्र",
+    docLookupTitle: "1-सेकंड मरीज पहचान व रिकॉर्ड",
+    docLookupSub: "क्यूआर स्कैन करें या मरीज चुनें और पिछला मेडिकल इतिहास देखें।",
+    docAllergyAlert: "अति-गंभीर दवा एलर्जी चेतावनी",
+    docTranslatorTitle: "2-तरफा रियल-टाइम वॉयस अनुवादक",
+    docTranslatorSub: "डॉक्टर मलयालम/अंग्रेजी में बोलेंगे ↔ मरीज को हिंदी/बंगाली में सुनाई देगा।",
+    docDoctorSpeaks: "डॉक्टर संवाद (मलयालम / अंग्रेजी)",
+    docWorkerSpeaks: "मरीज संवाद (हिंदी / बंगाली)",
+    docSpeakMic: "माइक दबाकर बोलें",
+    docPlayTranslated: "🔊 अनुवादित आवाज सुनें",
+    docPrescribeBtn: "डिजिटल पर्ची लिखें",
+    docMedicalTimeline: "मरीज का पिछला मेडिकल इतिहास व जांच",
+    docNoAllergies: "कोई ज्ञात दवा एलर्जी नहीं (NKDA)",
+
+    // Footer
+    footerGovtTitle: "केरल सरकार",
+    footerDept: "श्रम एवं कौशल विभाग एवं स्वास्थ्य सेवा निदेशालय",
+    footerHelplineTitle: "आपातकालीन एवं श्रमिक हेल्पलाइन:",
+    footerDisha: "दिशा स्वास्थ्य हेल्पलाइन: 1056 (टोल-फ्री)",
+    footerAwaz: "आवाज़ योजना सहायता: 1800-425-1147",
+    footerLabour: "श्रम सहायता केंद्र: 155214"
+  },
+
+  bn: {
+    // Brand & Header
+    brandName: "শ্রমিককেয়ার (ShramikCare)",
+    brandTagline: "আন্তঃরাজ্য পরিযায়ী ডিজিটাল স্বাস্থ্য সেতু",
+    govtBadge: "কেরল সরকার • শ্রম ও স্বাস্থ্য দপ্তরের যৌথ উদ্যোগ",
+    portalLogin: "পোর্টাল লগইন",
+    navHome: "হোম",
+    navCamps: "স্বাস্থ্য শিবির",
+    navFeatures: "সুবিধা",
+    navEmergency: "24x7 হেল্পলাইন: 1056",
+    languageSelect: "ভাষা",
+    activeSession: "সক্রিয় সেশন",
+    signOut: "লগআউট",
+    backToHome: "হোম পেজ",
+    workerDashboard: "শ্রমিক স্বাস্থ্য পোর্টাল",
+    doctorWorkstation: "ডাক্তার ক্লিনিক্যাল ওয়ার্কস্টেশন",
+
+    // Hero Section
+    heroBadge: "কেরল পরিযায়ী স্বাস্থ্য পরিকাঠামো • গডস ওন কান্ট্রি",
+    heroTitlePrefix: "কেরলের অতিথি শ্রমিকদের জন্য",
+    heroTitleHighlight: "স্বাস্থ্য ও কল্যাণ ডিজিটাল সেতু",
+    heroSubtitle: "ডিজিটাল স্বাস্থ্য রেকর্ড, ১৪-সংখ্যার আভা (ABHA) আইডি এবং আওয়াজ (AWAZ) বীমা সংযোগের সম্পূর্ণ ব্যবস্থা।",
+    ctaEnroll: "১-মিনিট ক্যাম্প রেজিস্ট্রেশন",
+    ctaQuickAccess: "পোর্টাল দ্রুত প্রবেশ",
+    ctaDoctorPortal: "ডাক্তার ও কেএমসি পোর্টাল",
+    heroTrust: "পেরুম্বাভুর, এর্নাকুলাম, কোঝিকোড় ও কান্নুরে ৩৫,০০০+ অতিথি শ্রমিকের বিশ্বস্ত সঙ্গী।",
+
+    // Metrics
+    metricWorkersTitle: "নিবন্ধিত অতিথি শ্রমিক",
+    metricWorkersTag: "↗ ১২% এই মাসে বৃদ্ধি",
+    metricWorkersSub: "ডিজিটাল পাসপোর্টে নথিভুক্ত",
+    metricCampsTitle: "সক্রিয় স্বাস্থ্য শিবির",
+    metricCampsTag: "⚠ ৩টি উচ্চ ঝুঁকিপূর্ণ এলাকা",
+    metricCampsSub: "মোবাইল মেডিকেল ও আউটরিচ দল",
+    metricAwazTitle: "আওয়াজ (AWAZ) দাবি নিষ্পত্তি",
+    metricAwazTag: "✓ ১০০% ক্যাশলেস পরিষেবা",
+    metricAwazSub: "মোট স্বাস্থ্য ও দুর্ঘটনা সহায়তা",
+
+    // Capabilities
+    campsHeading: "কেরলের লাইভ স্বাস্থ্য শিবির",
+    campsSub: "আজ বিভিন্ন নির্মাণ ও শিল্পাঞ্চলে কর্মরত মেডিকেল ক্যাম্পসমূহ।",
+    campStatusActive: "আজ সক্রিয়",
+
+    // Auth
+    authModalTitle: "শ্রমিককেয়ার মাল্টি-রোল পোর্টাল",
+    authModalSubtitle: "আপনার ডিজিটাল স্বাস্থ্য রেকর্ড দেখতে বা শ্রমিক নথিভুক্ত করতে ভূমিকা নির্বাচন করুন।",
+    tabWorker: "শ্রমিক",
+    tabDoctor: "ডাক্তার",
+    tabAdmin: "সরকারি নোডাল",
+    tabRegister: "১-মিনিট ক্যাম্প রেজিস্ট্রেশন",
+    loginHeadingWorker: "অতিথি শ্রমিক লগইন",
+    loginSubWorker: "আপনার মোবাইল নম্বর বা KL-MIG হেলথ আইডি দিয়ে লগইন করুন।",
+    loginHeadingDoctor: "ডাক্তার ও স্টাফ লগইন",
+    loginSubDoctor: "কেরল মেডিকেল কাউন্সিল (KMC) অনুমোদিত নিরাপদ পোর্টাল।",
+    loginHeadingAdmin: "নোডাল অফিসার লগইন",
+    loginSubAdmin: "কেরল রাজ্য প্রশাসনিক কমান্ড কনসোল।",
+    demoQuickLogin: "এক ক্লিকে ডেমো লগইন:",
+
+    // Worker Login Fields
+    btnWorkerLogin: "যাচাই করুন ও প্রবেশ করুন",
+    btnDoctorLogin: "লাইসেন্স যাচাই ও লগইন",
+    btnAdminLogin: "অফিসার পরিচয় প্রমাণীকরণ",
+    btnDemoRamesh: "ডেমো লগইন: রমেশ কুমার (বিহার)",
+    btnDemoBikash: "ডেমো লগইন: বিকাশ মন্ডল (পশ্চিমবঙ্গ)",
+    btnDemoDoctor: "ডেমো লগইন: ডঃ পি.কে. থমাস (আলুভা)",
+    btnDemoAdmin: "ডেমো লগইন: রাজেশ ভি. আইএএস",
+
+    // Tabs
+    dashTabPassport: "হেলথ পাস",
+    dashTabScanner: "এআই স্ক্যানার",
+    dashTabPills: "ওষুধ ঘড়ি",
+    dashTabWallet: "কল্যাণ তহবিল",
+
+    // Tab 1: Passport & SOS
+    passportTitle: "ডিজিটাল স্বাস্থ্য পাসপোর্ট",
+    emergencySosTitle: "জরুরি দ্রুত সহায়তা (SOS)",
+    sosDishaLabel: "দিশা স্বাস্থ্য হেল্পলাইন",
+    sosAmbulanceLabel: "জরুরি অ্যাম্বুলেন্স",
+    sosLabourLabel: "শ্রম দপ্তর সাহায্য",
+    vitalsTitle: "সাম্প্রতিক স্বাস্থ্য পরীক্ষার তথ্য",
+    vitalsBp: "রক্তচাপ (BP)",
+    vitalsSugar: "ব্লাড সুগার",
+    vitalsPulse: "নাড়ির গতি",
+    vitalsSpo2: "অক্সিজেন স্তর",
+    campCheckupTitle: "শেষ মেডিকেল ক্যাম্প পরীক্ষা",
+
+    // Tab 2: Scanner
+    scannerHeaderTitle: "লাইভ এআই প্রেসক্রিপশন স্ক্যানার",
+    scannerHeaderSub: "প্রেসক্রিপশন থেকে ওষুধের নাম, আওয়াজ প্রকল্প ও জন ঔষধি সঞ্চয় জানুন।",
+    scannerInstruction: "ডাক্তারের প্রেসক্রিপশনের উপর ক্যামেরা সোজা রাখুন।",
+    btnUploadRxFallback: "প্রেসক্রিপশনের ছবি আপলোড করুন",
+    resultDiagnosis: "চিহ্নিত রোগ / উপসর্গ:",
+    awazFreeTag: "✅ কেরল আওয়াজ প্রকল্পে ১০০% বিনামূল্যে চিকিৎসা",
+    awazFreeDesc: "এই রোগের চিকিৎসা কেরলের তালিকাভুক্ত হাসপাতালে সম্পূর্ণ ক্যাশলেস ও বিনামূল্যে পাওয়া যাবে।",
+    btnFindAwazHospitals: "🏥 আওয়াজ হাসপাতাল খুঁজুন - জেলা:",
+    janAushadhiTitle: "জন ঔষধি জেনেরিক সাশ্রয় তুলনামূলক তালিকা",
+    youSaveBadge: "আপনার মোট সঞ্চয়",
+    btnFindJanAushadhi: "💊 জন ঔষধি দোকান খুঁজুন - জেলা:",
+    btnSyncToPillClock: "⏰ ওষুধ খাওয়ার ঘড়িতে যুক্ত করুন",
+
+    // Tab 3: Pills
+    pillClockTitle: "বহুভাষিক ভয়েস ওষুধ ঘড়ি (পিল-ক্লক)",
+    pillClockSub: "ছবি ও বাংলায় কথা বলে ওষুধ মনে করিয়ে দেওয়ার ডিজিটাল ঘড়ি।",
+    btnPlayAllDoses: "🔊 আজকের সব ওষুধের সময় শুনুন",
+    btnPlaySlotAudio: "🔊 ভয়েস শুনুন",
+    audioPlayingState: "ভয়েস চলছে...",
+    btnMarkDoseTaken: "ওষুধ খেয়েছি ✓",
+    btnDoseCompleted: "আজ খাওয়া সম্পন্ন 🎉",
+    adherenceProgress: "আজকের ওষুধ খাওয়ার অগ্রগতি:",
+
+    // Tab 4: Wallet
+    walletTitle: "কেরল পরিযায়ী কল্যাণ ও আওয়াজ ওয়ালেট",
+    walletSub: "ক্যাশলেস চিকিৎসা সহায়তা, দুর্ঘটনা বীমা ও সরকারি প্রকল্প।",
+    awazCardLinkedTitle: "আওয়াজ স্মার্ট কার্ড সক্রিয় রয়েছে",
+    awazCardUnlinkedTitle: "আওয়াজ কার্ড যাচাইকরণ বাকি",
+    awazLimitTitle: "বার্ষিক ক্যাশলেস চিকিৎসা সীমা",
+    awazAvailableBalance: "অবশিষ্ট ব্যালেন্স",
+    awazUtilized: "চিকিৎসায় ব্যবহৃত",
+    recentClaimsTitle: "সাম্প্রতিক ক্যাশলেস দাবির বিবরণ",
+    claimHospital: "আলুভা তালুক হাসপাতাল (বহির্বিভাগ ও পরীক্ষা)",
+    otherSchemesTitle: "কেরল রাজ্য পরিযায়ী কল্যাণ প্রকল্পসমূহ",
+
+    // Modals
+    hospitalsModalTitle: "আওয়াজ তালিকাভুক্ত হাসপাতাল - জেলা:",
+    hospitalsModalSub: "অতিথি শ্রমিকদের জন্য বিনামূল্যে জরুরি ও বহির্বিভাগীয় চিকিৎসা।",
+    janAushadhiModalTitle: "সরকারি জন ঔষধি কেন্দ্র - জেলা:",
+    janAushadhiModalSub: "প্রমাণিত মানের অত্যন্ত সাশ্রয়ী জেনেরিক ওষুধের দোকান।",
+    callHospital: "কল করুন",
+    getDirections: "ম্যাপ দেখুন",
+    cashlessCoveredBadge: "১০০% ক্যাশলেস আওয়াজ হেল্পডেস্ক",
+    filterNotice: "আপনার কর্মক্ষেত্রের জেলা অনুসারে সাজানো হয়েছে:",
+
+    // Alerts
+    alertLoginSuccess: "স্বাগতম! সফলভাবে লগইন হয়েছে:",
+    alertRegisterSuccess: "নতুন হেলথ আইডি সহ শ্রমিক নিবন্ধিত হয়েছে:",
+    alertAuthFailed: "প্রবেশ তথ্য সঠিক নয়। অনুগ্রহ করে সঠিক তথ্য দিন বা ডেমো বোতাম ব্যবহার করুন।",
+    alertAbhaGenerated: "১৪-সংখ্যার আভা আইডি তৈরি করে সফলভাবে যুক্ত করা হয়েছে!",
+    alertRxAddedToPills: "প্রেসক্রিপশনের ওষুধগুলি আপনার ভয়েস পিল-ক্লকে যুক্ত করা হয়েছে!",
+    alertAwazLinked: "আওয়াজ কার্ড যাচাই সম্পন্ন! ₹৫০,০০০ ক্যাশলেস সুবিধা সক্রিয়।",
+
+    // DOCTOR WORKSTATION SPECIFIC
+    docWsTitle: "কেএমসি ডাক্তার ক্লিনিক্যাল ওয়ার্কস্টেশন",
+    docWsSub: "কেরল মেডিকেল কাউন্সিল অনুমোদিত জরুরি চিকিৎসা ও অনুবাদ কেন্দ্র",
+    docLookupTitle: "১-সেকেন্ড রোগী শনাক্তকরণ ও রেকর্ড",
+    docLookupSub: "কিউআর স্ক্যান করুন বা রোগী নির্বাচন করে পুরনো চিকিৎসার তথ্য দেখুন।",
+    docAllergyAlert: "গুরুতর ওষুধ অ্যালার্জি সতর্কতা",
+    docTranslatorTitle: "দ্বিমুখী রিয়েল-টাইম ভয়েস অনুবাদক",
+    docTranslatorSub: "ডাক্তার মালয়ালম/ইংরেজিতে বলবেন ↔ রোগী বাংলায় শুনবেন।",
+    docDoctorSpeaks: "ডাক্তারের কথা (মালয়ালম / ইংরেজি)",
+    docWorkerSpeaks: "রোগীর কথা (বাংলা / হিন্দি)",
+    docSpeakMic: "কথা বলতে বোতাম টিপুন",
+    docPlayTranslated: "🔊 অনুবাদিত ভয়েস শুনুন",
+    docPrescribeBtn: "ডিজিটাল প্রেসক্রিপশন লিখুন",
+    docMedicalTimeline: "রোগীর অতীত চিকিৎসা ও স্বাস্থ্য পরীক্ষার ইতিহাস",
+    docNoAllergies: "কোনো পরিচিত ওষুধ অ্যালার্জি নেই (NKDA)",
+
+    // Footer
+    footerGovtTitle: "কেরল সরকার",
+    footerDept: "শ্রম ও দক্ষতা দপ্তর এবং স্বাস্থ্য পরিষেবা অধিদপ্তর",
+    footerHelplineTitle: "জরুরি ও শ্রমিক হেল্পলাইন:",
+    footerDisha: "দিশা স্বাস্থ্য হেল্পলাইন: 1056 (টোল-ফ্রি)",
+    footerAwaz: "আওয়াজ স্কিম হেল্পলাইন: 1800-425-1147",
+    footerLabour: "শ্রমিক সাহায্য কেন্দ্র: 155214"
+  },
+
+  ml: {
+    // Brand & Header
+    brandName: "ശ്രമിക് കെയർ (ShramikCare)",
+    brandTagline: "അതിഥി തൊഴിലാളി ഡിജിറ്റൽ ആരോഗ്യ സേതു",
+    govtBadge: "കേരള സർക്കാർ • തൊഴിൽ - ആരോഗ്യ വകുപ്പുകളുടെ സംയുക്ത സംരംഭം",
+    portalLogin: "പോർട്ടൽ ലോഗിൻ",
+    navHome: "ഹോം",
+    navCamps: "മെഡിക്കൽ ക്യാമ്പുകൾ",
+    navFeatures: "സവിശേഷതകൾ",
+    navEmergency: "24x7 ഹെൽപ്പ്‌ലൈൻ: 1056",
+    languageSelect: "ഭാഷ",
+    activeSession: "ലോഗിൻ വിവരങ്ങൾ",
+    signOut: "ലോഗ് ഔട്ട്",
+    backToHome: "ഹോം പേജ്",
+    workerDashboard: "തൊഴിലാളി ആരോഗ്യ പോർട്ടൽ",
+    doctorWorkstation: "KMC ഡോക്ടർ ക്ലിനിക്കൽ വർക്ക്സ്റ്റേഷൻ",
+
+    // Hero Section
+    heroBadge: "കേരള മൈഗ്രന്റ് ഹെൽത്ത് ഇക്കോസിസ്റ്റം • ദൈവത്തിന്റെ സ്വന്തം നാട്",
+    heroTitlePrefix: "കേരളത്തിലെ അതിഥി തൊഴിലാളികൾക്കായി",
+    heroTitleHighlight: "ഡിജിറ്റൽ ആരോഗ്യ & ക്ഷേമ സേവനം",
+    heroSubtitle: "ഡിജിറ്റൽ ഹെൽത്ത് റെക്കോർഡുകൾ, 14-അക്ക ആഭ (ABHA) ഐഡി, ആവാസ് (AWAZ) ഇൻഷുറൻസ് സൗജന്യ ചികിത്സാ സഹായം.",
+    ctaEnroll: "1-മിനിറ്റ് ക്യാമ്പ് രജിസ്ട്രേഷൻ",
+    ctaQuickAccess: "പോർട്ടൽ ക്വിക്ക് ആക്സസ്",
+    ctaDoctorPortal: "ഡോക്ടർ & KMC പോർട്ടൽ",
+    heroTrust: "പെരുമ്പാവൂർ, എറണാകുളം, കോഴിക്കോട്, കണ്ണൂർ മേഖലകളിലെ 35,000+ അതിഥി തൊഴിലാളികളുടെ ആശ്രയം.",
+
+    // Metrics
+    metricWorkersTitle: "രജിസ്റ്റർ ചെയ്ത അതിഥി തൊഴിലാളികൾ",
+    metricWorkersTag: "↗ 12% ഈ മാസം വർദ്ധനവ്",
+    metricWorkersSub: "ഡിജിറ്റൽ ഹെൽത്ത് കാർഡ് ലഭിച്ചവർ",
+    metricCampsTitle: "സജീവ ആരോഗ്യ ക്യാമ്പുകൾ",
+    metricCampsTag: "⚠ 3 അതിജാഗ്രതാ മേഖലകൾ",
+    metricCampsSub: "മൊബൈൽ മെഡിക്കൽ ഔട്ട്‌റീച്ച് യൂണിറ്റുകൾ",
+    metricAwazTitle: "ആവാസ് (AWAZ) ക്ലെയിം തുക",
+    metricAwazTag: "✓ 100% സൗജന്യ ക്യാഷ്‌ലെസ്സ്",
+    metricAwazSub: "ആകെ ആരോഗ്യ & അപകട ഇൻഷുറൻസ്",
+
+    // Capabilities
+    campsHeading: "തത്സമയ മെഡിക്കൽ ക്യാമ്പുകൾ",
+    campsSub: "ഇന്ന് സംസ്ഥാനത്തെ പ്രധാന തൊഴിൽ കേന്ദ്രങ്ങളിൽ നടക്കുന്ന ആരോഗ്യ ക്യാമ്പുകൾ.",
+    campStatusActive: "ഇന്ന് സജീവം",
+
+    // Auth
+    authModalTitle: "ശ്രമിക് കെയർ മൾട്ടി-റോൾ പോർട്ടൽ",
+    authModalSubtitle: "ഡിജിറ്റൽ ഹെൽത്ത് റെക്കോർഡ് എടുക്കുന്നതിനോ പുതിയ തൊഴിലാളിയെ ചേർക്കുന്നതിനോ റോൾ തിരഞ്ഞെടുക്കുക.",
+    tabWorker: "തൊഴിലാളി",
+    tabDoctor: "ഡോക്ടർ",
+    tabAdmin: "സർക്കാർ നോഡൽ",
+    tabRegister: "1-മിനിറ്റ് ക്യാമ്പ് രജിസ്ട്രേഷൻ",
+    loginHeadingWorker: "അതിഥി തൊഴിലാളി ലോഗിൻ",
+    loginSubWorker: "രജിസ്റ്റർ ചെയ്ത മൊബൈൽ നമ്പർ അല്ലെങ്കിൽ KL-MIG ഹെൽത്ത് ഐഡി നൽകുക.",
+    loginHeadingDoctor: "ഡോക്ടർ & മെഡിക്കൽ സ്റ്റാഫ് ലോഗിൻ",
+    loginSubDoctor: "കേരള മെഡിക്കൽ കൗൺസിൽ (KMC) അംഗീകൃത സുരക്ഷിത പോർട്ടൽ.",
+    loginHeadingAdmin: "ഡിപ്പാർട്ട്മെന്റ് നോഡൽ ഓഫീസർ ലോഗിൻ",
+    loginSubAdmin: "കേരള ലേബർ & ഹെൽത്ത് അഡ്മിനിസ്ട്രേറ്റീവ് കൺസോൾ.",
+    demoQuickLogin: "ഡെമോ വൺ-ക്ലിക്ക് ലോഗിൻ:",
+
+    // Worker Login Fields
+    btnWorkerLogin: "പരിശോധിച്ച് പ്രവേശിക്കുക",
+    btnDoctorLogin: "KMC ലൈസൻസ് പരിശോധിച്ച് പ്രവേശിക്കുക",
+    btnAdminLogin: "ഓഫീസർ ആക്സസ് പരിശോധിക്കുക",
+    btnDemoRamesh: "ഡെമോ: രമേഷ് കുമാർ (ബിഹാർ)",
+    btnDemoBikash: "ഡെമോ: ബികാഷ് മൊണ്ടാൽ (പ. ബംഗാൾ)",
+    btnDemoDoctor: "ഡെമോ: ഡോ. പി.കെ. തോമസ് (ആലുവ PHC)",
+    btnDemoAdmin: "ഡെമോ: ശ്രീ. രാജേഷ് വി. IAS",
+
+    // Tabs
+    dashTabPassport: "ഹെൽത്ത് പാസ്സ്",
+    dashTabScanner: "AI സ്കാനർ",
+    dashTabPills: "മരുന്ന് ക്ലോക്ക്",
+    dashTabWallet: "ക്ഷേമനിധി",
+
+    // Tab 1: Passport & SOS
+    passportTitle: "ഡിജിറ്റൽ ഹെൽത്ത് പാസ്‌പോർട്ട്",
+    emergencySosTitle: "അടിയന്തിര സഹായം (SOS)",
+    sosDishaLabel: "ദിശ മെഡിക്കൽ ഹെൽപ്പ്‌ലൈൻ",
+    sosAmbulanceLabel: "ആംബുലൻസ് സർവീസ്",
+    sosLabourLabel: "തൊഴിൽ വകുപ്പ് സഹായം",
+    vitalsTitle: "ഏറ്റവും പുതിയ പരിശോധനാ വിവരങ്ങൾ",
+    vitalsBp: "രക്തസമ്മർദ്ദം (BP)",
+    vitalsSugar: "ബ്ലഡ് ഷുഗർ",
+    vitalsPulse: "പൾസ് നിരക്ക്",
+    vitalsSpo2: "ഓക്സിജൻ (SpO2)",
+    campCheckupTitle: "അവസാന ക്യാമ്പ് പരിശോധന",
+
+    // Tab 2: Scanner
+    scannerHeaderTitle: "തത്സമയ പ്രിസ്ക്രിപ്ഷൻ സ്കാനർ",
+    scannerHeaderSub: "ഡോക്ടറുടെ കുറിപ്പടി പരിശോധിച്ച് ആവാസ് സൗജന്യ ചികിത്സയും ജൻ ഔഷധി വിലക്കുറവും അറിയാം.",
+    scannerInstruction: "ഡോക്ടറുടെ കുറിപ്പടിക്ക് നേരെ ക്യാമറ പിടിക്കുക.",
+    btnUploadRxFallback: "കുറിപ്പടിയുടെ ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യുക",
+    resultDiagnosis: "കണ്ടെത്തിയ രോഗാവസ്ഥ:",
+    awazFreeTag: "✅ കേരള ആവാസ് പദ്ധതിയിൽ 100% സൗജന്യ ചികിത്സ",
+    awazFreeDesc: "ഈ രോഗാവസ്ഥയ്ക്ക് എംപാനൽ ചെയ്ത ആശുപത്രികളിൽ സൗജന്യ ചികിത്സ ലഭ്യമാണ്.",
+    btnFindAwazHospitals: "🏥 ആവാസ് ആശുപത്രികൾ കാണുക - ജില്ല:",
+    janAushadhiTitle: "ജൻ ഔഷധി ജനറിക് വിലക്കുറവ്",
+    youSaveBadge: "ആകെ ലാഭം",
+    btnFindJanAushadhi: "💊 ജൻ ഔഷധി കേന്ദ്രങ്ങൾ കാണുക - ജില്ല:",
+    btnSyncToPillClock: "⏰ മരുന്ന് ക്ലോക്കിലേക്ക് മാറ്റുക",
+
+    // Tab 3: Pills
+    pillClockTitle: "ബഹുഭാഷാ വോയ്‌സ് മരുന്ന് ക്ലോക്ക്",
+    pillClockSub: "ചിത്രങ്ങളും സ്വന്തം ഭാഷയിലെ ശബ്ദ നിർദ്ദേശങ്ങളും അടങ്ങിയ കൃത്യമായ മരുന്ന് സമയം.",
+    btnPlayAllDoses: "🔊 ദിവസത്തെ മുഴുവൻ മരുന്നുകളും കേൾക്കുക",
+    btnPlaySlotAudio: "🔊 ശബ്ദ നിർദ്ദേശം കേൾക്കുക",
+    audioPlayingState: "ശബ്ദം കേൾപ്പിക്കുന്നു...",
+    btnMarkDoseTaken: "മരുന്ന് കഴിച്ചു ✓",
+    btnDoseCompleted: "ഇന്ന് കഴിച്ചു കഴിഞ്ഞു 🎉",
+    adherenceProgress: "ഇന്നത്തെ മരുന്ന് കഴിച്ചതിന്റെ പുരോഗതി:",
+
+    // Tab 4: Wallet
+    walletTitle: "കേരള അതിഥി തൊഴിലാളി ക്ഷേമനിധി & ആവാസ് വാലറ്റ്",
+    walletSub: "സൗജന്യ ചികിത്സാ പരിരക്ഷയും സർക്കാർ ക്ഷേമ പദ്ധതികളും.",
+    awazCardLinkedTitle: "ആവാസ് സ്മാർട്ട് കാർഡ് ലിങ്ക് ചെയ്തിട്ടുണ്ട്",
+    awazCardUnlinkedTitle: "ആവാസ് കാർഡ് സ്ഥിരീകരിക്കേണ്ടതുണ്ട്",
+    awazLimitTitle: "വാർഷിക സൗജന്യ ചികിത്സാ പരിധി",
+    awazAvailableBalance: "ബാക്കി തുക",
+    awazUtilized: "ചികിത്സയ്ക്ക് ഉപയോഗിച്ചത്",
+    recentClaimsTitle: "സമീപകാല ക്ലെയിം വിവരങ്ങൾ",
+    claimHospital: "ആലുവ താലൂക്ക് ആശുപത്രി (ഒപി വിഭാഗം)",
+    otherSchemesTitle: "കേരള സർക്കാർ അതിഥി തൊഴിലാളി ക്ഷേമ പദ്ധതികൾ",
+
+    // Modals
+    hospitalsModalTitle: "ആവാസ് എംപാനൽ ചെയ്ത ആശുപത്രികൾ - ജില്ല:",
+    hospitalsModalSub: "അതിഥി തൊഴിലാളികൾക്കായി സൗജന്യ ക്യാഷ്‌ലെസ്സ് ചികിത്സ ലഭിക്കുന്ന കേന്ദ്രങ്ങൾ.",
+    janAushadhiModalTitle: "പി.എം ജൻ ഔഷധി കേന്ദ്രങ്ങൾ - ജില്ല:",
+    janAushadhiModalSub: "സർക്കാർ അംഗീകൃത കുറഞ്ഞ നിരക്കിലുള്ള ജനറിക് മരുന്ന് വിതരണ കേന്ദ്രങ്ങൾ.",
+    callHospital: "വിളിക്കുക",
+    getDirections: "മാപ്പ് കാണുക",
+    cashlessCoveredBadge: "100% ക്യാഷ്‌ലെസ്സ് ആവാസ് ഡെസ്ക്",
+    filterNotice: "നിങ്ങൾ ജോലി ചെയ്യുന്ന ജില്ലയിലെ കേന്ദ്രങ്ങൾ മാത്രം:",
+
+    // Alerts
+    alertLoginSuccess: "സ്വാഗതം! വിജയകരമായി ലോഗിൻ ചെയ്തു:",
+    alertRegisterSuccess: "തൊഴിലാളിയെ വിജയകരമായി ചേർത്തു. പുതിയ ഹെൽത്ത് ഐഡി:",
+    alertAuthFailed: "നൽകിയ വിവരങ്ങൾ തെറ്റാണ്. ദയവായി പരിശോധിക്കുക അല്ലെങ്കിൽ ഡെമോ ലോഗിൻ ഉപയോഗിക്കുക.",
+    alertAbhaGenerated: "14-അക്ക ആഭ ഐഡി വിജയകരമായി നിർമ്മിച്ച് ലിങ്ക് ചെയ്തു!",
+    alertRxAddedToPills: "കുറിപ്പടിയിലെ മരുന്നുകൾ നിങ്ങളുടെ വോയ്‌സ് മരുന്ന് ക്ലോക്കിൽ ചേർത്തു!",
+    alertAwazLinked: "ആവാസ് കാർഡ് സ്ഥിരീകരിച്ചു! ₹50,000 ക്യാഷ്‌ലെസ്സ് പരിരക്ഷ ലഭ്യമാണ്.",
+
+    // DOCTOR WORKSTATION SPECIFIC
+    docWsTitle: "KMC ഡോക്ടർ ക്ലിനിക്കൽ വർക്ക്സ്റ്റേഷൻ",
+    docWsSub: "കേരള മെഡിക്കൽ കൗൺസിൽ അംഗീകൃത മെഡിക്കൽ ട്രയേജ് & ട്രാൻസ്‌ലേഷൻ ഹബ്ബ്",
+    docLookupTitle: "1-സെക്കൻഡ് രോഗി പരിശോധന",
+    docLookupSub: "QR സ്കാൻ ചെയ്യുകയോ രോഗിയെ തിരഞ്ഞെടുക്കുകയോ ചെയ്ത് മുൻകാല ചികിത്സാ ചരിത്രം പരിശോധിക്കുക.",
+    docAllergyAlert: "ഗുരുതരമായ മരുന്ന് അലർജി മുന്നറിയിപ്പ്",
+    docTranslatorTitle: "തത്സമയ ദ്വിമുഖ വോയ്‌സ് ട്രാൻസ്‌ലേറ്റർ",
+    docTranslatorSub: "ഡോക്ടർ മലയാളം/ഇംഗ്ലീഷിൽ സംസാരിക്കുന്നു ↔ രോഗി ഹിന്ദി/ബംഗാളിയിൽ കേൾക്കുന്നു.",
+    docDoctorSpeaks: "ഡോക്ടറുടെ ശബ്ദം (മലയാളം / ഇംഗ്ലീഷ്)",
+    docWorkerSpeaks: "രോഗിയുടെ ശബ്ദം (ഹിന്ദി / ബംഗാളി)",
+    docSpeakMic: "സംസാരിക്കാൻ അമർത്തുക",
+    docPlayTranslated: "🔊 പരിഭാഷപ്പെടുത്തിയത് കേൾക്കുക",
+    docPrescribeBtn: "ഡിജിറ്റൽ കുറിപ്പടി എഴുതുക",
+    docMedicalTimeline: "രോഗിയുടെ മുൻകാല പരിശോധനാ വിവരങ്ങളും മരുന്നുകളും",
+    docNoAllergies: "മരുന്ന് അലർജികൾ ഇല്ല (NKDA)",
+
+    // Footer
+    footerGovtTitle: "കേരള സർക്കാർ",
+    footerDept: "തൊഴിൽ & നൈപുണ്യ വകുപ്പ്, ആരോഗ്യ വകുപ്പ് ഡയറക്ടറേറ്റ്",
+    footerHelplineTitle: "അടിയന്തിര & തൊഴിലാളി ഹെൽപ്പ്‌ലൈനുകൾ:",
+    footerDisha: "ദിശ ആരോഗ്യ ഹെൽപ്പ്‌ലൈൻ: 1056 (ടോൾ ഫ്രീ)",
+    footerAwaz: "ആവാസ് ഇൻഷുറൻസ് സഹായം: 1800-425-1147",
+    footerLabour: "തൊഴിൽ വകുപ്പ് ഹെൽപ്പ് ഡെസ്ക്: 155214"
+  }
+};

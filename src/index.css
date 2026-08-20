@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Kerala Backwater Pattern Generator / Decorative Utilities */
+.kerala-mesh-gradient {
+  background: radial-gradient(circle at 10% 20%, rgba(13, 92, 82, 0.95) 0%, rgba(6, 78, 59, 1) 90%);
+}
+
+.kerala-gold-gradient {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.kerala-glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.kerala-glass-dark {
+  background: rgba(13, 92, 82, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
