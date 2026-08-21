@@ -22,21 +22,28 @@ export const LandingAuthPage = () => {
   const { openAuthModal, login } = useApp();
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] font-sans overflow-x-hidden pt-24 pb-12 relative">
+      {/* Background Gradient & Wave Layer */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f0ebff] via-[#f8f9ff] to-[#e4f0ff] opacity-70"></div>
+        <div className="absolute top-0 right-0 w-[60%] h-full bg-gradient-to-bl from-[#7b5cf5]/10 to-transparent"></div>
+        {/* Soft radial glow behind image */}
+        <div className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-[#7b5cf5] rounded-full blur-[120px] opacity-10"></div>
+      </div>
+
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-8">
         {/* ================= HERO SECTION ================= */}
-        <div className="flex flex-col lg:flex-row items-center pt-8 pb-16 lg:pb-24">
+        <div className="flex flex-col lg:flex-row items-center pt-8 pb-32 lg:pb-40 relative">
           
           {/* Left Hero Content */}
-          <div className="w-full lg:w-[50%] space-y-6 pr-0 lg:pr-12">
+          <div className="w-full lg:w-[50%] space-y-6 pr-0 lg:pr-12 relative z-20">
             
-            <div className="inline-block px-4 py-1.5 rounded-md bg-[#eee7ff] text-[#6d4be0] text-sm font-bold shadow-sm">
+            <div className="inline-block px-4 py-1.5 rounded-md bg-[#eee7ff] text-[#6d4be0] text-sm font-bold shadow-sm backdrop-blur-sm border border-[#d6c9ff]/50">
               Kerala Migrant Health Ecosystem (KMHE)
             </div>
 
             <h1 className="text-4xl lg:text-[54px] font-extrabold text-[#1f2937] leading-[1.1] tracking-tight">
               Bridging Healthcare & <br /> Welfare for Kerala's <br />
-              <span className="text-[#6d4be0]">Guest Workforce</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd]">Guest Workforce</span>
             </h1>
 
             <p className="text-gray-600 text-[17px] max-w-lg leading-relaxed">
@@ -47,39 +54,39 @@ export const LandingAuthPage = () => {
             <div className="flex flex-wrap gap-4 pt-2">
               <button 
                 onClick={() => openAuthModal('worker')}
-                className="flex items-center justify-between w-48 bg-gradient-to-br from-[#ece5ff] to-[#f4efff] border border-[#d6c9ff] p-4 rounded-xl hover:shadow-md transition-shadow group text-left"
+                className="flex items-center justify-between w-48 bg-gradient-to-br from-[#ece5ff] to-[#f4efff] border border-[#d6c9ff] p-4 rounded-xl hover:shadow-md hover:scale-105 transition-all group text-left"
               >
                 <div className="flex flex-col">
                   <User className="w-6 h-6 text-[#6d4be0] mb-2" />
                   <span className="text-[#3b2b73] font-bold text-[15px]">Worker Login</span>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-[#6d4be0] flex items-center justify-center text-white group-hover:translate-x-1 transition-transform">
+                <div className="w-6 h-6 rounded-full bg-[#6d4be0] flex items-center justify-center text-white group-hover:translate-x-1 transition-transform shadow-sm">
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </button>
 
               <button 
                 onClick={() => openAuthModal('doctor')}
-                className="flex items-center justify-between w-48 bg-gradient-to-br from-[#296aff] to-[#5a93ff] p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow group text-left"
+                className="flex items-center justify-between w-48 bg-gradient-to-br from-[#296aff] to-[#5a93ff] p-4 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all group text-left"
               >
                 <div className="flex flex-col">
                   <Stethoscope className="w-6 h-6 text-white mb-2" />
                   <span className="text-white font-bold text-[15px]">Doctor Login</span>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[#296aff] group-hover:translate-x-1 transition-transform">
+                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[#296aff] group-hover:translate-x-1 transition-transform shadow-sm">
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </button>
 
               <button 
                 onClick={() => openAuthModal('admin')}
-                className="flex items-center justify-between w-48 bg-gradient-to-br from-[#2cc299] to-[#5bd7b6] p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow group text-left"
+                className="flex items-center justify-between w-48 bg-gradient-to-br from-[#2cc299] to-[#5bd7b6] p-4 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition-all group text-left"
               >
                 <div className="flex flex-col">
                   <Building2 className="w-6 h-6 text-white mb-2" />
                   <span className="text-white font-bold text-[15px] leading-tight">Government <br/>Portal</span>
                 </div>
-                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[#2cc299] group-hover:translate-x-1 transition-transform">
+                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[#2cc299] group-hover:translate-x-1 transition-transform shadow-sm">
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </button>
@@ -94,7 +101,7 @@ export const LandingAuthPage = () => {
               
               <button 
                 onClick={() => login('worker', { identifier: 'KL-MIG-78219' })}
-                className="flex items-center space-x-3 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
+                className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
               >
                 <div className="w-6 h-6 bg-teal-100 text-teal-800 rounded-full flex items-center justify-center text-xs font-bold">
                   R
@@ -108,7 +115,7 @@ export const LandingAuthPage = () => {
 
               <button 
                 onClick={() => login('worker', { identifier: 'KL-MIG-88412' })}
-                className="flex items-center space-x-3 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
+                className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors"
               >
                 <div className="w-6 h-6 bg-indigo-100 text-indigo-800 rounded-full flex items-center justify-center text-xs font-bold">
                   B
@@ -123,15 +130,33 @@ export const LandingAuthPage = () => {
 
           </div>
           
-          {/* Right Hero Image Layout */}
-          <div className="w-full lg:w-[50%] mt-12 lg:mt-0 relative hidden lg:flex justify-end pr-0 lg:pr-8">
-            <img 
-              src="/hero-collage.jpg" 
-              alt="ShramikCare Hero Collage"
-              className="w-[110%] max-w-none ml-auto object-contain transform translate-x-8"
-            />
+          {/* Right Hero Image Layout (Blended) */}
+          <div className="absolute top-0 right-[-10%] w-full lg:w-[65%] h-full hidden lg:flex justify-end items-center z-10 pointer-events-none">
+            <div 
+              className="w-full h-[120%] absolute right-0 top-[-10%]"
+              style={{
+                // Fade out the left edge completely and blend top/bottom
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 25%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+                WebkitMaskComposite: 'source-in',
+                maskImage: 'linear-gradient(to right, transparent 0%, black 25%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+                maskComposite: 'intersect',
+              }}
+            >
+              <img 
+                src="/hero-collage.jpg" 
+                alt="ShramikCare Healthcare Ecosystem"
+                className="w-full h-full object-cover object-left-top opacity-95 mix-blend-multiply"
+              />
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Hero Bottom Elegant Wave SVG */}
+      <div className="absolute w-full left-0 bottom-[-2px] z-20 pointer-events-none">
+        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto drop-shadow-sm">
+          <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f8f9ff" />
+        </svg>
       </div>
 
       {/* ================= MIDDLE BANNER ================= */}
