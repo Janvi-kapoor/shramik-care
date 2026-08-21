@@ -22,12 +22,15 @@ export const LandingAuthPage = () => {
   const { openAuthModal, login } = useApp();
 
   return (
-      {/* Background Gradient & Wave Layer */}
+    <div className="min-h-screen bg-[#f8f9ff] font-sans overflow-x-hidden pt-24 pb-12 relative">
+      {/* Background Layer */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f0ebff] via-[#f8f9ff] to-[#e4f0ff] opacity-70"></div>
-        <div className="absolute top-0 right-0 w-[60%] h-full bg-gradient-to-bl from-[#7b5cf5]/10 to-transparent"></div>
-        {/* Soft radial glow behind image */}
-        <div className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-[#7b5cf5] rounded-full blur-[120px] opacity-10"></div>
+        {/* Base ultra-light background */}
+        <div className="absolute inset-0 bg-[#f7f9ff]"></div>
+        {/* Soft purple glow on the far left/top */}
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#e3d7ff] rounded-full blur-[120px] opacity-60"></div>
+        {/* Pure white glowing center */}
+        <div className="absolute top-[20%] left-[30%] w-[40%] h-[80%] bg-white rounded-full blur-[100px] opacity-100 z-10"></div>
       </div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-8">
@@ -128,39 +131,26 @@ export const LandingAuthPage = () => {
               </button>
             </div>
 
-          </div>
-          
-          {/* Right Hero Image Layout (Blended) */}
-          <div className="absolute top-0 right-[-10%] w-full lg:w-[65%] h-full hidden lg:flex justify-end items-center z-10 pointer-events-none">
-            <div 
-              className="w-full h-[120%] absolute right-0 top-[-10%]"
+          {/* Right Hero Image Layout (Blended & Large) */}
+          <div className="absolute top-0 right-0 w-full lg:w-[65%] h-[115%] hidden lg:flex justify-end items-start z-0 pointer-events-none overflow-hidden">
+            <div className="absolute inset-0 bg-white/20 z-10 mask-fade"></div>
+            <img 
+              src="/hero-collage.jpg" 
+              alt="ShramikCare Healthcare Ecosystem"
+              className="w-full h-full object-cover object-left-top opacity-100"
               style={{
-                // Fade out the left edge completely and blend top/bottom
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 25%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-                WebkitMaskComposite: 'source-in',
-                maskImage: 'linear-gradient(to right, transparent 0%, black 25%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-                maskComposite: 'intersect',
+                // Extremely smooth left fade to blend perfectly into the center white area
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, black 40%, black 100%)',
+                maskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, black 40%, black 100%)',
               }}
-            >
-              <img 
-                src="/hero-collage.jpg" 
-                alt="ShramikCare Healthcare Ecosystem"
-                className="w-full h-full object-cover object-left-top opacity-95 mix-blend-multiply"
-              />
-            </div>
+            />
           </div>
         </div>
       </div>
 
-      {/* Hero Bottom Elegant Wave SVG */}
-      <div className="absolute w-full left-0 bottom-[-2px] z-20 pointer-events-none">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto drop-shadow-sm">
-          <path d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z" fill="#f8f9ff" />
-        </svg>
-      </div>
-
       {/* ================= MIDDLE BANNER ================= */}
-      <div className="relative z-20 max-w-[1400px] mx-auto px-4 sm:px-8 -mt-6">
+      {/* Negative top margin to overlap the bottom curve of the hero area */}
+      <div className="relative z-30 max-w-[1400px] mx-auto px-4 sm:px-8 mt-[-40px]">
         <div className="bg-[#242159] rounded-2xl shadow-xl flex flex-wrap justify-between items-center py-6 px-10 text-white gap-y-6">
           <div className="flex items-center space-x-4">
             <ShieldCheck className="w-10 h-10 text-[#d4d1fb] opacity-80" />
