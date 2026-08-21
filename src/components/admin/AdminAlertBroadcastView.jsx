@@ -6,6 +6,7 @@ export const AdminAlertBroadcastView = () => {
   const { t, showToast } = useApp();
   const [message, setMessage] = useState('');
   const [targetDistricts, setTargetDistricts] = useState('all');
+  const [priority, setPriority] = useState('Important');
 
   const [isBroadcasting, setIsBroadcasting] = useState(false);
 
@@ -20,12 +21,13 @@ export const AdminAlertBroadcastView = () => {
           title: 'Emergency Advisory',
           message: message,
           target_district: targetDistricts,
-          target_languages: ['hi', 'bn', 'ml']
+          target_languages: ['hi', 'bn', 'ml'],
+          priority: priority
         })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      showToast('Alert broadcasted successfully via SMS and Dashboards.', 'success');
+      showToast(`Alert broadcasted to ${data.recipientCount ?? 'multiple'} workers.`, 'success');
       setMessage('');
     } catch (e) {
       showToast('Error broadcasting alert', 'error');
@@ -50,17 +52,32 @@ export const AdminAlertBroadcastView = () => {
         </div>
 
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Target District(s)</label>
-            <select 
-              value={targetDistricts}
-              onChange={(e) => setTargetDistricts(e.target.value)}
-              className="w-full p-3 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-amber-500"
-            >
-              <option value="all">All Kerala Districts</option>
-              <option value="ernakulam">Ernakulam (High Priority)</option>
-              <option value="trivandrum">Thiruvananthapuram</option>
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Target District(s)</label>
+              <select 
+                value={targetDistricts}
+                onChange={(e) => setTargetDistricts(e.target.value)}
+                className="w-full p-3 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-amber-500"
+              >
+                <option value="all">All Kerala Districts</option>
+                <option value="ernakulam">Ernakulam (High Priority)</option>
+                <option value="trivandrum">Thiruvananthapuram</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Priority</label>
+              <select 
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="w-full p-3 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-amber-500"
+              >
+                <option value="Normal">Normal</option>
+                <option value="Important">Important</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
           </div>
 
           <div>

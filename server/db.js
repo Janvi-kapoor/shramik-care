@@ -213,6 +213,24 @@ const db = new sqlite3.Database(dbPath, (err) => {
         message TEXT,
         translations TEXT,
         target_district TEXT,
+        priority TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`);
+      
+      // Let's add priority if missing
+      db.run("ALTER TABLE broadcast_alerts ADD COLUMN priority TEXT", (err) => {});
+
+      // Worker Notifications (Per-worker)
+      db.run(`CREATE TABLE IF NOT EXISTS worker_notifications (
+        id TEXT PRIMARY KEY,
+        workerId TEXT,
+        broadcastId TEXT,
+        title TEXT,
+        message TEXT,
+        translations TEXT,
+        priority TEXT,
+        district TEXT,
+        is_read INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
 

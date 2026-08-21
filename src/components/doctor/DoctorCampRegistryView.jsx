@@ -13,8 +13,29 @@ import {
 } from 'lucide-react';
 
 export const DoctorCampRegistryView = () => {
-  const { workers, activeSession, showToast } = useApp();
+  const { workers: appWorkers, activeSession, showToast } = useApp();
   const doctor = activeSession?.user;
+  
+  const [campWorkers, setCampWorkers] = React.useState([]);
+
+  React.useEffect(() => {
+    if (doctor?.id) {
+      fetch(`http://localhost:5000/api/camps/doctor/${doctor.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            return fetch(`http://localhost:5000/api/camps/${data[0].id}/workers`);
+          }
+        })
+        .then(res => res ? res.json() : [])
+        .then(data => {
+          if (data && !data.error) setCampWorkers(data);
+        })
+        .catch(console.error);
+    }
+  }, [doctor?.id]);
+
+  const workers = campWorkers.length > 0 ? campWorkers : appWorkers;
 
   const handleExportReport = () => {
     showToast('Camp Clinical Registry summary exported successfully (KMC Format).', 'success');

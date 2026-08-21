@@ -106,6 +106,14 @@ router.get('/health-overview', (req, res) => {
   });
 });
 
+// Doctors
+router.get('/doctors', (req, res) => {
+  db.all('SELECT * FROM doctors', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 // Camps
 router.get('/camps', (req, res) => {
   db.all('SELECT * FROM camps ORDER BY created_at DESC', [], (err, rows) => {
@@ -142,8 +150,9 @@ router.post('/camps', (req, res) => {
 // Broadcast (Multilingual with Gemini)
 const { GoogleGenAI } = require('@google/genai');
 router.post('/broadcast', async (req, res) => {
-  const { title, message, target_district, target_languages } = req.body;
+  const { title, message, target_district, target_languages, priority } = req.body;
   const notifId = 'NOTIF-' + Date.now();
+  const alertPriority = priority || 'Important';
   
   let translations = {};
   
@@ -162,7 +171,7 @@ router.post('/broadcast', async (req, res) => {
           });
           translations[lang] = response.text.trim();
         } catch (e) {
-          console.error(`Failed to translate to ${lang}:`, e);
+          console.error("Translation error", e);
         }
       }
     }
@@ -170,11 +179,35 @@ router.post('/broadcast', async (req, res) => {
   
   const translationsStr = JSON.stringify(translations);
 
-  db.run(`INSERT INTO broadcast_alerts (id, title, message, translations, target_district) VALUES (?, ?, ?, ?, ?)`,
-    [notifId, title, message, translationsStr, target_district],
+  db.run(`INSERT INTO broadcast_alerts (id, title, message, translations, target_district, priority) VALUES (?, ?, ?, ?, ?, ?)`,
+    [notifId, title, message, translationsStr, target_district, alertPriority],
     function(err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ success: true, notifId, translations });
+      
+      // Now find eligible workers and insert per-worker notifications
+      let workerQuery = "SELECT id FROM workers";
+      let params = [];
+      if (target_district !== 'all') {
+        // Simple case-insensitive like match or exact match depending on data
+        workerQuery += " WHERE LOWER(district) = LOWER(?) OR LOWER(keralaDistrict) = LOWER(?)";
+        params = [target_district, target_district];
+      }
+      
+      db.all(workerQuery, params, (err, workers) => {
+        if (err || !workers.length) {
+          return res.json({ success: true, notifId, translations, recipientCount: 0 });
+        }
+        
+        const stmt = db.prepare(`INSERT INTO worker_notifications (id, workerId, broadcastId, title, message, translations, priority, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
+        
+        workers.forEach(w => {
+          stmt.run('WNOTIF-' + w.id + '-' + Date.now(), w.id, notifId, title, message, translationsStr, alertPriority, target_district);
+        });
+        
+        stmt.finalize((err) => {
+          res.json({ success: true, notifId, translations, recipientCount: workers.length });
+        });
+      });
     }
   );
 });

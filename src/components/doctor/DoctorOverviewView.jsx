@@ -17,27 +17,50 @@ import {
 } from 'lucide-react';
 
 export const DoctorOverviewView = () => {
-  const { workers, activeSession, selectedPatient, setSelectedPatient, setActiveDoctorTab, t } = useApp();
+  const { workers: appWorkers, activeSession, selectedPatient, setSelectedPatient, setActiveDoctorTab, t } = useApp();
   const doctor = activeSession?.user;
+  
+  const [activeCamp, setActiveCamp] = React.useState(null);
+  const [campWorkers, setCampWorkers] = React.useState([]);
+
+  React.useEffect(() => {
+    if (doctor?.id) {
+      fetch(`http://localhost:5000/api/camps/doctor/${doctor.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            setActiveCamp(data[0]); // Active camp
+            return fetch(`http://localhost:5000/api/camps/${data[0].id}/workers`);
+          }
+        })
+        .then(res => res ? res.json() : [])
+        .then(data => {
+          if (data && !data.error) setCampWorkers(data);
+        })
+        .catch(console.error);
+    }
+  }, [doctor?.id]);
+
+  const workers = activeCamp ? campWorkers : appWorkers;
 
   const stats = [
     {
       label: "Patients Triaged Today",
-      value: "38",
+      value: workers.length.toString(),
       subtext: "On-site camp screening",
       icon: Users,
       color: "text-teal-900 bg-teal-50 border-teal-200"
     },
     {
       label: "Critical Allergies Flagged",
-      value: "4",
+      value: workers.filter(w => w.allergies && !w.allergies.includes('No Known Drug Allergies (NKDA)')).length.toString(),
       subtext: "Penicillin & Sulfa alerts",
       icon: AlertTriangle,
       color: "text-rose-900 bg-rose-50 border-rose-200"
     },
     {
       label: "Prescriptions Dispatched",
-      value: "29",
+      value: "0",
       subtext: "Jan Aushadhi generic linked",
       icon: Pill,
       color: "text-amber-900 bg-amber-50 border-amber-200"
@@ -66,10 +89,10 @@ export const DoctorOverviewView = () => {
             <span>Live Health Camp Active</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-white">
-            Perumbavoor Plywood Cluster Evening Triage Unit #2
+            {activeCamp ? activeCamp.name : 'No Active Camps Assigned'}
           </h2>
           <span className="text-xs text-teal-100 block mt-1">
-            Nodal Hospital: {doctor?.facility} • KMC Verification: {doctor?.kmcLicense}
+            Nodal Hospital: {doctor?.facility} • Location: {activeCamp ? activeCamp.district : 'N/A'}
           </span>
         </div>
 

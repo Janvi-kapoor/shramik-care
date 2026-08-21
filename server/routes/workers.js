@@ -86,13 +86,45 @@ router.post('/enroll-camp', (req, res) => {
   const token = 'TK-' + Math.floor(Math.random() * 10000);
   
   const db = require('../db');
-  db.run(`INSERT INTO camp_enrollments (id, campId, workerId, token, status) VALUES (?, ?, ?, ?, 'Registered')`,
-    [enrollId, campId, workerId, token],
-    function(err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ success: true, token });
+  
+  // Check for duplicates
+  db.get(`SELECT id FROM camp_enrollments WHERE workerId = ? AND campId = ?`, [workerId, campId], (err, existing) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (existing) {
+      return res.status(400).json({ error: 'Worker is already enrolled in this camp' });
     }
-  );
+    
+    db.run(`INSERT INTO camp_enrollments (id, campId, workerId, token, status) VALUES (?, ?, ?, ?, 'Registered')`,
+      [enrollId, campId, workerId, token],
+      function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, token });
+      }
+    );
+  });
+});
+
+// Get notifications for a worker
+router.get('/:id/notifications', (req, res) => {
+  db.all('SELECT * FROM worker_notifications WHERE workerId = ? ORDER BY created_at DESC', [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    const parsedRows = rows.map(r => ({
+      ...r,
+      translations: r.translations ? JSON.parse(r.translations) : {},
+      is_read: !!r.is_read
+    }));
+    
+    res.json(parsedRows);
+  });
+});
+
+// Mark notification as read
+router.put('/:id/notifications/:notifId/read', (req, res) => {
+  db.run('UPDATE worker_notifications SET is_read = 1 WHERE id = ? AND workerId = ?', [req.params.notifId, req.params.id], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true });
+  });
 });
 
 module.exports = router;

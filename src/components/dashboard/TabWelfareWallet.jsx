@@ -16,10 +16,31 @@ export const TabWelfareWallet = () => {
   const { activeSession, toggleAwazCardLink, showToast, t } = useApp();
   const [isVerifyingModal, setIsVerifyingModal] = useState(false);
   const [inputCardNo, setInputCardNo] = useState('');
+  const [notifications, setNotifications] = useState([]);
 
   if (!activeSession || activeSession.role !== 'worker') return null;
   const worker = activeSession.user;
   const isLinked = !!worker.isAwazLinked;
+
+  React.useEffect(() => {
+    fetch(`http://localhost:5000/api/workers/${worker.id}/notifications`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setNotifications(data);
+        }
+      })
+      .catch(console.error);
+  }, [worker.id]);
+
+  const markAsRead = async (notifId) => {
+    try {
+      await fetch(`http://localhost:5000/api/workers/${worker.id}/notifications/${notifId}/read`, { method: 'PUT' });
+      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, is_read: true } : n));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const coverageLimit = worker.awazCoverageLimit || 50000;
   const utilizedAmount = worker.awazUtilizedAmount || 7500;
@@ -36,8 +57,38 @@ export const TabWelfareWallet = () => {
     setIsVerifyingModal(false);
   };
 
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Govt Advisories */}
+      {notifications.length > 0 && (
+        <div className="space-y-3">
+          {notifications.map(notif => {
+            const localizedMessage = notif.translations?.[activeSession.language] || notif.message;
+            return (
+              <div key={notif.id} className={`p-4 rounded-xl border ${notif.is_read ? 'bg-slate-50 border-slate-200' : 'bg-rose-50 border-rose-200 shadow-sm'} flex items-start gap-3 transition-colors`}>
+                <div className={`p-2 rounded-lg ${notif.is_read ? 'bg-slate-200 text-slate-500' : 'bg-rose-100 text-rose-600'}`}>
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className={`text-sm font-bold ${notif.is_read ? 'text-slate-700' : 'text-rose-900'}`}>{notif.title}</h3>
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      {new Date(notif.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className={`text-xs mt-1 ${notif.is_read ? 'text-slate-600' : 'text-rose-800'}`}>{localizedMessage}</p>
+                </div>
+                {!notif.is_read && (
+                  <button onClick={() => markAsRead(notif.id)} className="text-[10px] font-bold text-rose-700 uppercase bg-rose-100 hover:bg-rose-200 px-2 py-1 rounded">Mark Read</button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* 1. Header Card */}
       <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>

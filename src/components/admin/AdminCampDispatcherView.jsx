@@ -6,12 +6,24 @@ export const AdminCampDispatcherView = () => {
   const { showToast } = useApp();
   
   const [camps, setCamps] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchCamps();
+    fetchDoctors();
   }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/admin/doctors');
+      const json = await res.json();
+      if (res.ok) setDoctors(json);
+    } catch (err) {
+      console.error('Failed to load doctors:', err);
+    }
+  };
 
   const fetchCamps = async () => {
     setLoading(true);
@@ -34,11 +46,15 @@ export const AdminCampDispatcherView = () => {
     const location = e.target.elements.location.value;
     const date = e.target.elements.date.value;
     const purpose = e.target.elements.purpose.value;
-    const capacity = e.target.elements.capacity.value;
+    const capacity = parseInt(e.target.elements.capacity.value, 10);
     const assigned_doctor_ids = e.target.elements.doctor.value;
     
     if (!date) {
       showToast('error', 'Please select a date for the camp');
+      return;
+    }
+    if (capacity <= 0) {
+      showToast('error', 'Capacity must be a positive number');
       return;
     }
 
@@ -53,7 +69,7 @@ export const AdminCampDispatcherView = () => {
       const json = await response.json();
       if (!response.ok) throw new Error(json.error);
       
-      showToast('success', `Health camp deployed at ${location}`);
+      showToast('success', `Health camp deployed successfully.`);
       e.target.reset();
       fetchCamps();
     } catch (err) {
@@ -102,13 +118,16 @@ export const AdminCampDispatcherView = () => {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Capacity</label>
-                  <input name="capacity" type="number" required defaultValue="50" className="w-full p-2.5 rounded-lg border border-slate-300 text-sm focus:ring-1 focus:ring-teal-500 bg-white shadow-sm" />
+                  <input name="capacity" type="number" required defaultValue="50" min="1" className="w-full p-2.5 rounded-lg border border-slate-300 text-sm focus:ring-1 focus:ring-teal-500 bg-white shadow-sm" />
                 </div>
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Assigned Doctor</label>
-                <select name="doctor" className="w-full p-2.5 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-teal-500 bg-white shadow-sm">
-                  <option value="DOC-ALUVA-01">Dr. Mathew Thomas (DOC-ALUVA-01)</option>
+                <select name="doctor" required className="w-full p-2.5 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-teal-500 bg-white shadow-sm">
+                  {doctors.map(doc => (
+                    <option key={doc.id} value={doc.id}>{doc.name} ({doc.facility})</option>
+                  ))}
+                  {doctors.length === 0 && <option value="">Loading doctors...</option>}
                 </select>
               </div>
               <button disabled={isSubmitting} type="submit" className="w-full py-3 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-lg uppercase tracking-wider text-sm transition-colors shadow-md mt-2 flex justify-center">

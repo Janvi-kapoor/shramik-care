@@ -162,8 +162,8 @@ export const AdminHeatmapView = () => {
             <thead className="bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-semibold">District</th>
-                <th className="px-4 py-3 font-semibold">Condition</th>
-                <th className="px-4 py-3 font-semibold">Reported Cases</th>
+                <th className="px-4 py-3 font-semibold">Symptom</th>
+                <th className="px-4 py-3 font-semibold">Reports</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
               </tr>
             </thead>
@@ -177,7 +177,7 @@ export const AdminHeatmapView = () => {
                     <span className={`px-2 py-1 rounded text-xs font-bold ${
                       c.count >= 10 ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'
                     }`}>
-                      {c.count >= 10 ? 'Elevated' : 'Normal'}
+                      {c.count >= 10 ? 'Increased' : 'Normal'}
                     </span>
                   </td>
                 </tr>
