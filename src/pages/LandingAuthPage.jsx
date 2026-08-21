@@ -23,23 +23,6 @@ export const LandingAuthPage = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] font-sans overflow-x-hidden pt-24 pb-12 relative">
-      {/* Background Gradient & Shape Layer */}
-      <div 
-        className="absolute top-0 right-0 w-[55%] h-[700px] pointer-events-none"
-        style={{
-          background: 'linear-gradient(135deg, #a78bfa 0%, #7b5cf5 100%)',
-          clipPath: 'path("M0,0 L1000,0 L1000,700 Q500,800 0,600 Z")', // Approximate wave shape
-          zIndex: 0,
-        }}
-      >
-        <img 
-          src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-          alt="Kerala Health" 
-          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#7b5cf5]/80"></div>
-      </div>
-
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-8">
         {/* ================= HERO SECTION ================= */}
         <div className="flex flex-col lg:flex-row items-center pt-8 pb-16 lg:pb-24">
@@ -141,14 +124,11 @@ export const LandingAuthPage = () => {
           </div>
           
           {/* Right Hero Image Layout */}
-          <div className="w-full lg:w-[50%] mt-12 lg:mt-0 relative hidden lg:block">
-            {/* Using the uploaded image precisely if needed, or approximating collage via standard img tag with exact border radius */}
+          <div className="w-full lg:w-[50%] mt-12 lg:mt-0 relative hidden lg:flex justify-end pr-0 lg:pr-8">
             <img 
-              src="/placeholder_right_collage.jpg" 
-              onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}
-              alt="Collage"
-              className="w-full rounded-tl-full rounded-bl-full shadow-2xl object-cover"
-              style={{ clipPath: 'path("M 50,0 C 150,0 200,100 250,200 C 300,300 150,400 50,500 L 500,500 L 500,0 Z")' }} // Fallback if custom SVG masking is needed
+              src="/hero-collage.jpg" 
+              alt="ShramikCare Hero Collage"
+              className="w-[110%] max-w-none ml-auto object-contain transform translate-x-8"
             />
           </div>
         </div>

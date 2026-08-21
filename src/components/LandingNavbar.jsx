@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ChevronDown, User } from 'lucide-react';
+import { ChevronDown, User, Globe } from 'lucide-react';
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', native: 'English', script: 'EN' },
+  { code: 'hi', label: 'Hindi', native: 'हिंदी', script: 'HI' },
+  { code: 'bn', label: 'Bengali', native: 'বাংলা', script: 'BN' },
+  { code: 'ml', label: 'Malayalam', native: 'മലയാളം', script: 'ML' }
+];
 
 export const LandingNavbar = () => {
-  const { openAuthModal } = useApp();
+  const { openAuthModal, currentLanguage, setLanguage } = useApp();
+  const [isLangOpen, setIsLangOpen] = useState(false);
+
+  // Find active language safely
+  const activeLang = LANGUAGES.find(l => l.code === currentLanguage) || LANGUAGES[0];
 
   return (
     <nav className="absolute top-0 w-full z-50 bg-transparent px-4 sm:px-8 py-4">
@@ -36,10 +47,33 @@ export const LandingNavbar = () => {
 
         {/* Right Actions */}
         <div className="flex items-center space-x-4">
-          <button className="hidden sm:flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-semibold text-slate-700 hover:bg-slate-50">
-            <span>English</span>
-            <ChevronDown className="w-4 h-4 text-slate-400" />
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setIsLangOpen(!isLangOpen)}
+              className="hidden sm:flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <span>{activeLang.label}</span>
+              <ChevronDown className="w-4 h-4 text-slate-400" />
+            </button>
+            
+            {isLangOpen && (
+              <div className="absolute top-full mt-2 right-0 w-40 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden py-1 z-[100]">
+                {LANGUAGES.map(lang => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setIsLangOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${currentLanguage === lang.code ? 'text-[#6a54d5] font-bold bg-[#f8f9ff]' : 'text-slate-700'}`}
+                  >
+                    <span>{lang.label}</span>
+                    <span className="text-xs text-slate-400">{lang.script}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           
           <button 
             onClick={() => openAuthModal('worker')}
