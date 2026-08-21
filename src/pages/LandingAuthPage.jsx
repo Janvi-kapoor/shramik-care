@@ -17,7 +17,9 @@ import {
   ArrowRight,
   ExternalLink,
   Phone,
-  Sparkles
+  Sparkles,
+  Stethoscope,
+  Building2
 } from 'lucide-react';
 
 const SCHEMES_LIST = [
@@ -106,26 +108,35 @@ export const LandingAuthPage = () => {
       {/* ========================================================================= */}
       {/* 1. LANDING PAGE HERO (STRICT 50-50 SPLIT ON DESKTOP)                      */}
       {/* ========================================================================= */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#042F2E] via-[#0D5C52] to-[#064E3B] text-white py-10 lg:py-14 px-4 sm:px-6 lg:px-8 border-b border-teal-800/60 shadow-md">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative z-10">
+      <section 
+        className="relative overflow-hidden text-white py-16 lg:py-24 px-4 sm:px-6 lg:px-8 shadow-xl"
+        style={{
+          backgroundImage: 'linear-gradient(to right, rgba(4, 47, 46, 0.96), rgba(13, 92, 82, 0.85), rgba(6, 78, 59, 0.6)), url("https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+        }}
+      >
+        <div className="absolute inset-0 bg-teal-900/10 mix-blend-multiply"></div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
           
           {/* ----------------- LEFT COLUMN (50%): RESTRAINED TEXT ----------------- */}
-          <div className="space-y-4 text-left">
+          <div className="space-y-5 text-left">
             {/* Small Badge */}
-            <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded bg-white/10 backdrop-blur-md border border-white/15 text-xs font-semibold text-teal-100">
-              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-teal-950/40 backdrop-blur-md border border-teal-500/30 text-xs font-semibold text-teal-100 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
               <span>Kerala Migrant Health Ecosystem (KMHE)</span>
             </div>
 
             {/* Proportional H1 */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
               Bridging Healthcare & Welfare for{' '}
-              <span className="text-amber-400">Kerala's Guest Workforce</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500 drop-shadow-none">Kerala's Guest Workforce</span>
             </h1>
 
             {/* Subtext (Max 2 lines) */}
-            <p className="text-xs sm:text-sm text-teal-100/90 leading-relaxed max-w-lg">
-              Portable digital health records, 14-digit ABHA ID integration, and zero-friction AWAZ insurance linkage.
+            <p className="text-sm sm:text-base text-teal-50 leading-relaxed max-w-lg drop-shadow-sm font-medium">
+              Portable digital health passports, 14-digit ABHA integration, and zero-friction AWAZ insurance linkage.
             </p>
 
             {/* Action Buttons */}
@@ -136,16 +147,25 @@ export const LandingAuthPage = () => {
                 className="py-2.5 px-5 rounded-lg bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm uppercase tracking-wider shadow-sm transition-colors flex items-center justify-center space-x-2 cursor-pointer"
               >
                 <LogIn className="w-4 h-4" />
-                <span>{t('ctaQuickAccess')}</span>
+                <span>Worker Login</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => openAuthModal('register')}
-                className="py-2.5 px-5 rounded-lg bg-teal-900 hover:bg-teal-950 text-white font-bold text-xs sm:text-sm uppercase tracking-wider border border-teal-600/60 transition-colors flex items-center justify-center space-x-2 cursor-pointer"
+                onClick={() => openAuthModal('doctor')}
+                className="py-2.5 px-5 rounded-lg bg-teal-800 hover:bg-teal-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider shadow-sm transition-colors flex items-center justify-center space-x-2 cursor-pointer"
               >
-                <UserPlus className="w-4 h-4 text-amber-400" />
-                <span>{t('ctaEnroll')}</span>
+                <Stethoscope className="w-4 h-4 text-teal-200" />
+                <span>Doctor Login</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => openAuthModal('admin')}
+                className="py-2.5 px-5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider border border-slate-600/60 transition-colors flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <Building2 className="w-4 h-4 text-slate-300" />
+                <span>Government Portal</span>
               </button>
             </div>
 
@@ -176,9 +196,32 @@ export const LandingAuthPage = () => {
             </div>
           </div>
 
-          {/* ----------------- RIGHT COLUMN (50%): INTERACTIVE CAMP SLIDER ----------------- */}
-          <div className="w-full">
-            <MedicalCampCarousel />
+          {/* ----------------- RIGHT COLUMN (50%): KERALA CAMP IMAGES ----------------- */}
+          <div className="w-full hidden lg:grid grid-cols-2 gap-4">
+            <div className="space-y-4 pt-8">
+              <img 
+                src="https://images.unsplash.com/photo-1541888081699-28157e1b5700?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                alt="Migrant Construction Worker" 
+                className="w-full h-48 object-cover rounded-2xl shadow-xl border-4 border-white/10 transform hover:-translate-y-1 transition-transform duration-300"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                alt="Worker Safety & Health" 
+                className="w-full h-64 object-cover rounded-2xl shadow-xl border-4 border-white/10 transform hover:-translate-y-1 transition-transform duration-300"
+              />
+            </div>
+            <div className="space-y-4">
+              <img 
+                src="https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                alt="Industrial Worksite" 
+                className="w-full h-64 object-cover rounded-2xl shadow-xl border-4 border-white/10 transform hover:-translate-y-1 transition-transform duration-300"
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1590424744257-f827449bcbc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                alt="Kerala Migrant Workforce" 
+                className="w-full h-48 object-cover rounded-2xl shadow-xl border-4 border-white/10 transform hover:-translate-y-1 transition-transform duration-300"
+              />
+            </div>
           </div>
         </div>
       </section>

@@ -57,14 +57,14 @@ const COMMON_WORKER_PHRASES = [
 ];
 
 export const DoctorVoiceTranslator = () => {
-  const { selectedPatient, speakText, stopSpeech, isAudioSpeaking, t } = useApp();
+  const { selectedPatient, speakText, stopSpeech, isAudioSpeaking, showToast, t } = useApp();
   
   // Translation Direction: 'doctor_to_worker' | 'worker_to_doctor'
   const [direction, setDirection] = useState('doctor_to_worker');
   const [doctorLang, setDoctorLang] = useState('en'); // 'en' | 'ml'
   const [workerLang, setWorkerLang] = useState(selectedPatient?.audioLanguage || 'hi'); // 'hi' | 'bn'
   
-  const [inputText, setInputText] = useState("Can you tell me what's your problem and where you feel the pain?");
+  const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -93,13 +93,8 @@ export const DoctorVoiceTranslator = () => {
 
     // Speak in native BCP-47 target language
     const targetBcp47 = targetLang === 'ml' ? 'ml-IN' : targetLang === 'bn' ? 'bn-IN' : targetLang === 'hi' ? 'hi-IN' : 'en-IN';
-    speakText(translated, 'translator', targetBcp47);
+    speakText(translated, 'translator', targetBcp47, true);
   };
-
-  // Run initial translation on mount
-  useEffect(() => {
-    handleTranslateAndSpeak("Can you tell me what's your problem and where you feel the pain?");
-  }, [workerLang, doctorLang, direction]);
 
   // Web Speech Recognition for Live Mic
   const toggleSpeechRecognition = () => {
@@ -113,10 +108,7 @@ export const DoctorVoiceTranslator = () => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      const sample = direction === 'doctor_to_worker' 
-        ? (doctorLang === 'ml' ? COMMON_DOCTOR_PHRASES[0].ml : COMMON_DOCTOR_PHRASES[0].en)
-        : (workerLang === 'bn' ? COMMON_WORKER_PHRASES[0].bn : COMMON_WORKER_PHRASES[0].hi);
-      handleTranslateAndSpeak(sample);
+      showToast('Speech Recognition is not supported by your browser.', 'error');
       return;
     }
 
@@ -159,10 +151,8 @@ export const DoctorVoiceTranslator = () => {
   const handleSwapDirection = () => {
     const nextDir = direction === 'doctor_to_worker' ? 'worker_to_doctor' : 'doctor_to_worker';
     setDirection(nextDir);
-    const newSample = nextDir === 'doctor_to_worker' 
-      ? (doctorLang === 'ml' ? COMMON_DOCTOR_PHRASES[0].ml : COMMON_DOCTOR_PHRASES[0].en)
-      : (workerLang === 'bn' ? COMMON_WORKER_PHRASES[0].bn : COMMON_WORKER_PHRASES[0].hi);
-    handleTranslateAndSpeak(newSample);
+    setInputText("");
+    setTranslatedText("");
   };
 
   return (
@@ -310,7 +300,7 @@ export const DoctorVoiceTranslator = () => {
                   const targetBcp47 = (direction === 'doctor_to_worker')
                     ? (workerLang === 'bn' ? 'bn-IN' : 'hi-IN')
                     : (doctorLang === 'ml' ? 'ml-IN' : 'en-IN');
-                  speakText(translatedText, 'translator', targetBcp47);
+                  speakText(translatedText, 'translator', targetBcp47, true);
                 }}
                 className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded bg-teal-900/60 hover:bg-teal-900 text-xs font-bold text-amber-300 transition-colors"
               >

@@ -127,7 +127,7 @@ export const AuthModal = () => {
   };
 
   // --- Handlers for Login ---
-  const handleWorkerLogin = (e) => {
+  const handleWorkerLogin = async (e) => {
     e?.preventDefault();
     setErrorMsg('');
     if (!workerIdentifier.trim()) {
@@ -135,18 +135,16 @@ export const AuthModal = () => {
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      const res = login('worker', { identifier: workerIdentifier });
-      setIsLoading(false);
-      if (res.success) {
-        closeAuthModal();
-      } else {
-        setErrorMsg(res.message);
-      }
-    }, 300);
+    const res = await login('worker', { identifier: workerIdentifier });
+    setIsLoading(false);
+    if (res.success) {
+      closeAuthModal();
+    } else {
+      setErrorMsg(res.message);
+    }
   };
 
-  const handleDoctorLogin = (e) => {
+  const handleDoctorLogin = async (e) => {
     e?.preventDefault();
     setErrorMsg('');
     if (!doctorId.trim() || !kmcLicense.trim()) {
@@ -154,18 +152,16 @@ export const AuthModal = () => {
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      const res = login('doctor', { doctorId, kmcLicense });
-      setIsLoading(false);
-      if (res.success) {
-        closeAuthModal();
-      } else {
-        setErrorMsg(res.message);
-      }
-    }, 300);
+    const res = await login('doctor', { doctorId, kmcLicense });
+    setIsLoading(false);
+    if (res.success) {
+      closeAuthModal();
+    } else {
+      setErrorMsg(res.message);
+    }
   };
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e?.preventDefault();
     setErrorMsg('');
     if (!officerId.trim() || !adminPin.trim()) {
@@ -173,48 +169,40 @@ export const AuthModal = () => {
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      const res = login('admin', { officerId, pin: adminPin });
-      setIsLoading(false);
-      if (res.success) {
-        closeAuthModal();
-      } else {
-        setErrorMsg(res.message);
-      }
-    }, 300);
+    const res = await login('admin', { officerId, pin: adminPin });
+    setIsLoading(false);
+    if (res.success) {
+      closeAuthModal();
+    } else {
+      setErrorMsg(res.message);
+    }
   };
 
   // Demo Login Auto-fill & Submit
-  const handleDemoWorker = (id) => {
+  const handleDemoWorker = async (id) => {
     setWorkerIdentifier(id);
     setIsLoading(true);
-    setTimeout(() => {
-      const res = login('worker', { identifier: id });
-      setIsLoading(false);
-      if (res.success) closeAuthModal();
-    }, 250);
+    const res = await login('worker', { identifier: id });
+    setIsLoading(false);
+    if (res.success) closeAuthModal();
   };
 
-  const handleDemoDoctor = () => {
+  const handleDemoDoctor = async () => {
     setDoctorId('DOC-ALUVA-01');
     setKmcLicense('KMC-88214');
     setIsLoading(true);
-    setTimeout(() => {
-      const res = login('doctor', { doctorId: 'DOC-ALUVA-01', kmcLicense: 'KMC-88214' });
-      setIsLoading(false);
-      if (res.success) closeAuthModal();
-    }, 250);
+    const res = await login('doctor', { doctorId: 'DOC-ALUVA-01', kmcLicense: 'KMC-88214' });
+    setIsLoading(false);
+    if (res.success) closeAuthModal();
   };
 
-  const handleDemoAdmin = () => {
-    setOfficerId('OFF-ERN-01');
+  const handleDemoAdmin = async () => {
+    setOfficerId('GOVT-ADMIN-01');
     setAdminPin('1234');
     setIsLoading(true);
-    setTimeout(() => {
-      const res = login('admin', { officerId: 'OFF-ERN-01', pin: '1234' });
-      setIsLoading(false);
-      if (res.success) closeAuthModal();
-    }, 250);
+    const res = await login('admin', { officerId: 'GOVT-ADMIN-01', pin: '1234' });
+    setIsLoading(false);
+    if (res.success) closeAuthModal();
   };
 
   // --- Handlers for Wizard Form ---
@@ -636,7 +624,7 @@ export const AuthModal = () => {
                         <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 transition-transform group-hover:translate-x-0.5" />
                       </div>
                       <span className="text-[10px] text-slate-500 font-mono">
-                        OFF-ERN-01 • PIN: 1234 (District Labour Nodal)
+                        GOVT-ADMIN-01 • PIN: 1234 (District Labour Nodal)
                       </span>
                     </button>
                   </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { 
   LayoutDashboard, 
@@ -16,8 +17,6 @@ import {
 
 export const DoctorSidebar = ({ onReturnHome }) => {
   const { 
-    activeDoctorTab, 
-    setActiveDoctorTab, 
     activeSession, 
     selectedPatient,
     logout, 
@@ -29,31 +28,31 @@ export const DoctorSidebar = ({ onReturnHome }) => {
 
   const navItems = [
     {
-      id: 'overview',
-      label: 'Dashboard Overview',
-      subLabel: "Today's Triage Stats",
-      icon: LayoutDashboard,
-    },
-    {
-      id: 'patient-lookup',
-      label: 'Patient QR & Vitals',
-      subLabel: 'Timeline & Allergy Alert',
-      badge: selectedPatient ? selectedPatient.bloodGroup : 'Scan',
+      id: 'scanner',
+      label: 'Live QR Scanner',
+      subLabel: 'Webcam Lookup',
+      badge: 'Scan',
       icon: QrCode,
     },
     {
-      id: 'voice-translator',
+      id: 'records',
+      label: 'Clinical Record & Timeline',
+      subLabel: 'Vitals & Allergies',
+      badge: selectedPatient ? selectedPatient.bloodGroup : 'None',
+      icon: ClipboardList,
+    },
+    {
+      id: 'translator',
       label: '2-Way Voice Translator',
       subLabel: 'Malayalam ↔ Hindi/Bengali',
       badge: 'Live Mic',
       icon: Languages,
     },
     {
-      id: 'camp-registry',
-      label: 'Camp Registry & Reports',
-      subLabel: 'Field Audit Log',
-      badge: '3 Patients',
-      icon: ClipboardList,
+      id: 'analytics',
+      label: 'Daily Screening Analytics',
+      subLabel: 'Patient Counts & Logs',
+      icon: LayoutDashboard,
     },
   ];
 
@@ -103,42 +102,45 @@ export const DoctorSidebar = ({ onReturnHome }) => {
 
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeDoctorTab === item.id;
 
           return (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => setActiveDoctorTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all duration-150 group ${
+              to={`/doctor/${item.id}`}
+              className={({ isActive }) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all duration-150 group ${
                 isActive
                   ? 'bg-teal-800 text-white font-bold shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold'
               }`}
             >
-              <div className="flex items-center space-x-3 min-w-0">
-                <Icon
-                  className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                    isActive ? 'text-amber-300 scale-110' : 'text-slate-400 group-hover:text-slate-700'
-                  }`}
-                />
-                <div className="truncate">
-                  <span className="text-xs block leading-tight truncate">
-                    {item.label}
-                  </span>
-                  <span className={`text-[10px] block truncate ${isActive ? 'text-teal-200' : 'text-slate-400'}`}>
-                    {item.subLabel}
-                  </span>
-                </div>
-              </div>
+              {({ isActive }) => (
+                <>
+                  <div className="flex items-center space-x-3 min-w-0">
+                    <Icon
+                      className={`w-4 h-4 flex-shrink-0 transition-transform ${
+                        isActive ? 'text-amber-300 scale-110' : 'text-slate-400 group-hover:text-slate-700'
+                      }`}
+                    />
+                    <div className="truncate">
+                      <span className="text-xs block leading-tight truncate">
+                        {item.label}
+                      </span>
+                      <span className={`text-[10px] block truncate ${isActive ? 'text-teal-200' : 'text-slate-400'}`}>
+                        {item.subLabel}
+                      </span>
+                    </div>
+                  </div>
 
-              {item.badge && (
-                <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md ${
-                  isActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-700'
-                }`}>
-                  {item.badge}
-                </span>
+                  {item.badge && (
+                    <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md ${
+                      isActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
-            </button>
+            </NavLink>
           );
         })}
       </nav>

@@ -1,12 +1,38 @@
 import React, { useState } from 'react';
-import { AppProvider, useApp } from './context/AppContext';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useApp } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
+
+// Modals & Globals
 import { LandingNavbar } from './components/LandingNavbar';
+import { AppHeader } from './components/AppHeader';
+import { Footer } from './components/Footer';
+import { AuthModal } from './components/AuthModal';
+import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
+
+// Pages
 import { LandingAuthPage } from './pages/LandingAuthPage';
 import { WorkerDashboardPage } from './pages/WorkerDashboardPage';
 import { DoctorWorkstationPage } from './pages/DoctorWorkstationPage';
-import { Footer } from './components/Footer';
-import { AuthModal } from './components/AuthModal';
-import { CheckCircle2, AlertCircle, Info, ArrowRight, LayoutDashboard, Stethoscope } from 'lucide-react';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
+
+// Doctor Views
+import { DoctorQRScannerView } from './components/doctor/DoctorQRScannerView';
+import { DoctorPatientLookup } from './components/doctor/DoctorPatientLookup';
+import { DoctorVoiceTranslator } from './components/doctor/DoctorVoiceTranslator';
+import { DoctorOverviewView } from './components/doctor/DoctorOverviewView';
+
+// Admin Views
+import { AdminHeatmapView } from './components/admin/AdminHeatmapView';
+import { AdminCampDispatcherView } from './components/admin/AdminCampDispatcherView';
+import { AdminAlertBroadcastView } from './components/admin/AdminAlertBroadcastView';
+import { AdminInsuranceClaimsView } from './components/admin/AdminInsuranceClaimsView';
+
+// Worker Views
+import { TabHealthPassport } from './components/dashboard/TabHealthPassport';
+import { TabAiScanner } from './components/dashboard/TabAiScanner';
+import { TabVoicePillClock } from './components/dashboard/TabVoicePillClock';
+import { TabWelfareWallet } from './components/dashboard/TabWelfareWallet';
 
 const ToastNotification = () => {
   const { toast } = useApp();
@@ -16,7 +42,7 @@ const ToastNotification = () => {
   const isError = toast.type === 'error';
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-[999] animate-in slide-in-from-bottom-5 fade-in duration-300">
       <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl shadow-2xl border text-xs font-bold ${
         isSuccess
           ? 'bg-emerald-950 text-emerald-100 border-emerald-600'
@@ -37,67 +63,103 @@ const ToastNotification = () => {
   );
 };
 
+// Protected Route Component
+const ProtectedRoute = ({ allowedRole }) => {
+  const { activeSession } = useApp();
+  
+  if (!activeSession) {
+    return <Navigate to="/" replace />;
+  }
+  
+  if (allowedRole && activeSession.role !== allowedRole) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return <Outlet />;
+};
+
 const MainContent = () => {
   const { activeSession } = useApp();
-  const [viewOverride, setViewOverride] = useState(null);
 
-  // 1. Doctor Session Active
-  if (activeSession && activeSession.role === 'doctor' && viewOverride !== 'landing') {
-    return (
-      <>
-        <DoctorWorkstationPage onReturnHome={() => setViewOverride('landing')} />
-        <ToastNotification />
-      </>
-    );
-  }
-
-  // 2. Worker Session Active
-  if (activeSession && activeSession.role === 'worker' && viewOverride !== 'landing') {
-    return (
-      <>
-        <WorkerDashboardPage onReturnHome={() => setViewOverride('landing')} />
-        <ToastNotification />
-      </>
-    );
-  }
-
-  // 3. Guest / Landing Page
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
-      {/* If any user is logged in while viewing Landing page, show top sticky shortcut to return */}
-      {activeSession && (
-        <div className="sticky top-0 z-50 bg-amber-500 text-slate-950 py-2 px-4 text-center shadow-sm flex items-center justify-center space-x-2">
-          <span className="text-xs font-bold">
-            Active Session: <strong>{activeSession.user.name} ({activeSession.role.toUpperCase()})</strong>
-          </span>
-          <button
-            onClick={() => setViewOverride('dashboard')}
-            className="inline-flex items-center space-x-1 px-3 py-1 rounded-md bg-slate-950 text-amber-300 font-bold text-xs hover:bg-slate-900 transition-colors ml-2"
-          >
-            {activeSession.role === 'doctor' ? (
-              <>
-                <Stethoscope className="w-3.5 h-3.5" />
-                <span>Open Doctor Workstation</span>
-              </>
-            ) : (
-              <>
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>Open Worker Dashboard</span>
-              </>
-            )}
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
+    <>
+      <Routes>
+        {/* PUBLIC ROUTE: LANDING */}
+        <Route path="/" element={
+          activeSession ? (
+            <Navigate to={`/${activeSession.role === 'worker' ? 'worker/home' : activeSession.role === 'doctor' ? 'doctor/scanner' : 'admin/overview'}`} replace />
+          ) : (
+            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
+              <LandingNavbar />
+              <main className="flex-1">
+                <LandingAuthPage />
+              </main>
+              <Footer />
+            </div>
+          )
+        } />
 
-      <LandingNavbar />
-      <main className="flex-1">
-        <LandingAuthPage />
-      </main>
-      <Footer />
+        {/* WORKER ROUTES */}
+        <Route element={<ProtectedRoute allowedRole="worker" />}>
+          <Route path="/worker" element={
+            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
+              <AppHeader />
+              <main className="flex-1 pb-20">
+                <WorkerDashboardPage />
+              </main>
+            </div>
+          }>
+            <Route index element={<Navigate to="home" replace />} />
+            <Route path="home" element={<TabWelfareWallet />} /> {/* Using wallet as home temporarily, will refactor */}
+            <Route path="health-id" element={<TabHealthPassport />} />
+            <Route path="medicines" element={<TabAiScanner />} />
+            <Route path="care" element={<TabVoicePillClock />} />
+          </Route>
+        </Route>
+
+        {/* DOCTOR ROUTES */}
+        <Route element={<ProtectedRoute allowedRole="doctor" />}>
+          <Route path="/doctor" element={
+            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
+              <AppHeader />
+              <main className="flex-1 pb-20">
+                <DoctorWorkstationPage />
+              </main>
+            </div>
+          }>
+            <Route index element={<Navigate to="scanner" replace />} />
+            <Route path="scanner" element={<DoctorQRScannerView />} />
+            <Route path="patients" element={<DoctorPatientLookup />} />
+            <Route path="consult" element={<DoctorPatientLookup />} /> {/* Shared view for now */}
+            <Route path="translator" element={<DoctorVoiceTranslator />} />
+          </Route>
+        </Route>
+
+        {/* ADMIN ROUTES */}
+        <Route element={<ProtectedRoute allowedRole="admin" />}>
+          <Route path="/admin" element={
+            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
+              <AppHeader />
+              <main className="flex-1 pb-20">
+                <AdminDashboardPage />
+              </main>
+            </div>
+          }>
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<AdminHeatmapView />} />
+            <Route path="outbreaks" element={<AdminHeatmapView />} />
+            <Route path="camps" element={<AdminCampDispatcherView />} />
+            <Route path="claims" element={<AdminInsuranceClaimsView />} />
+          </Route>
+        </Route>
+        
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
       <AuthModal />
       <ToastNotification />
-    </div>
+    </>
   );
 };
 

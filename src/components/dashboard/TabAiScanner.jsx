@@ -1,188 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import { 
-  Camera, 
-  Sparkles, 
-  CheckCircle2, 
-  AlertCircle, 
-  Building2, 
-  Pill, 
-  RotateCcw, 
-  Zap, 
-  Upload, 
-  FileText, 
-  Clock, 
-  Eye, 
-  ChevronRight,
-  Stethoscope,
-  ShieldCheck,
-  Percent
+  Camera, Sparkles, CheckCircle2, Building2, Pill, RotateCcw, 
+  Upload, FileText, Clock, Eye, Save, Volume2, Plus, Trash2, Maximize2
 } from 'lucide-react';
-import Tesseract from 'tesseract.js';
-
-// Generic medicine catalog for dynamic matching
-const GENERIC_CATALOG = [
-  {
-    keywords: ['paracetamol', 'dolo', 'calpol', 'pyrexia', 'pcm', '650'],
-    brandedName: 'Dolo 650mg / Calpol',
-    genericName: 'Paracetamol Tablet IP 650mg',
-    dosage: '1 Tablet - Thrice Daily',
-    timing: 'After Food (सुबह ☀️, दोपहर 🌤️, रात 🌙)',
-    duration: '3 Days',
-    brandedPrice: 34.00,
-    janAushadhiPrice: 11.20,
-    instructions: {
-      en: 'Take 1 tablet after food three times a day for fever.',
-      hi: 'बुखार के लिए दिन में 3 बार खाना खाने के बाद 1 गोली लें।',
-      bn: 'জ্বরের জন্য দিনে ৩ বার খাবার পর ১টি করে ট্যাবলেট খান।',
-      ml: 'പനിക്കായി ദിവസവും മൂന്ന് നേരം ഭക്ഷണത്തിന് ശേഷം 1 ഗുളിക കഴിക്കുക.'
-    }
-  },
-  {
-    keywords: ['amoxicillin', 'augmentin', 'clavam', 'clav', 'mox', '625', 'antibiotic'],
-    brandedName: 'Augmentin 625 Duo',
-    genericName: 'Amoxicillin & Pot. Clavulanate 625mg',
-    dosage: '1 Tablet - Twice Daily',
-    timing: 'After Food (Morning ☀️, Night 🌙)',
-    duration: '5 Days',
-    brandedPrice: 204.00,
-    janAushadhiPrice: 48.00,
-    instructions: {
-      en: 'Take 1 tablet after breakfast and 1 after dinner for infection.',
-      hi: 'संक्रमण के लिए सुबह नाश्ते के बाद और रात के खाने के बाद 1 गोली लें।',
-      bn: 'সংক্রমণের জন্য সকালে নাস্তার পর এবং রাতে খাবারের পর ১টি করে ট্যাবলেট খান।',
-      ml: 'അണുബാധയ്ക്ക് രാവിലെയും രാത്രിയും ഭക്ഷണത്തിന് ശേഷം 1 ഗുളിക കഴിക്കുക.'
-    }
-  },
-  {
-    keywords: ['cetirizine', 'allegra', 'cetzine', 'levocet', 'allergy', 'cold', '10mg'],
-    brandedName: 'Allegra / Cetzine 10mg',
-    genericName: 'Cetirizine Hydrochloride 10mg',
-    dosage: '1 Tablet - Night Only',
-    timing: 'Before Sleep with Water (Night 🌙)',
-    duration: '5 Days',
-    brandedPrice: 45.00,
-    janAushadhiPrice: 8.00,
-    instructions: {
-      en: 'Take 1 tablet at night before sleeping for allergy and cough.',
-      hi: 'एलर्जी और खांसी के लिए रात को सोने से पहले 1 गोली पानी के साथ लें।',
-      bn: 'অ্যালার্জি ও কাশির জন্য রাতে ঘুমানোর আগে ১টি ট্যাবলেট খান।',
-      ml: 'അലർജിക്കും ചുമയ്ക്കുമായി രാത്രി ഉറങ്ങുന്നതിന് മുൻപ് 1 ഗുളിക കഴിക്കുക.'
-    }
-  },
-  {
-    keywords: ['azithromycin', 'azee', 'azithral', '500mg', '500'],
-    brandedName: 'Azee 500 / Azithral',
-    genericName: 'Azithromycin Tablet IP 500mg',
-    dosage: '1 Tablet - Once Daily',
-    timing: '1 Hour Before Food (Morning ☀️)',
-    duration: '3 Days',
-    brandedPrice: 142.00,
-    janAushadhiPrice: 38.00,
-    instructions: {
-      en: 'Take 1 tablet once daily on an empty stomach.',
-      hi: 'दिन में 1 बार खाली पेट 1 गोली लें।',
-      bn: 'দিনে ১ বার খালি পেটে ১টি ট্যাবলেট খান।',
-      ml: 'ദിവസത്തിൽ ഒരിക്കൽ വെറുംവയറ്റിൽ 1 ഗുളിക കഴിക്കുക.'
-    }
-  },
-  {
-    keywords: ['pantoprazole', 'pan', 'pantocid', 'acidity', 'gas', '40mg'],
-    brandedName: 'Pan 40 / Pantocid',
-    genericName: 'Pantoprazole Gastro-Resistant IP 40mg',
-    dosage: '1 Tablet - Morning Fasting',
-    timing: 'Before Breakfast (Morning ☀️)',
-    duration: '5 Days',
-    brandedPrice: 98.00,
-    janAushadhiPrice: 14.50,
-    instructions: {
-      en: 'Take 1 tablet in the morning before breakfast for acidity.',
-      hi: 'गैस और एसिडिटी के लिए सुबह नाश्ते से पहले 1 गोली लें।',
-      bn: 'গ্যাসের জন্য সকালে নাস্তার আগে ১টি ট্যাবলেট খান।',
-      ml: 'അസിഡിറ്റിക്കായി രാവിലെ പ്രഭാതഭക്ഷണത്തിന് മുൻപ് 1 ഗുളിക കഴിക്കുക.'
-    }
-  }
-];
-
-// Helper to generate sample prescription image onto canvas
-const createSamplePrescriptionCanvas = (sampleType = 'fever') => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 800;
-  canvas.height = 1000;
-  const ctx = canvas.getContext('2d');
-
-  // Background
-  ctx.fillStyle = '#FAFAF9';
-  ctx.fillRect(0, 0, 800, 1000);
-
-  // Clinic Header
-  ctx.fillStyle = '#0D5C52';
-  ctx.fillRect(0, 0, 800, 120);
-
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 28px sans-serif';
-  ctx.fillText('ALUVA TALUK HEADQUARTERS HOSPITAL', 40, 50);
-  ctx.font = '16px sans-serif';
-  ctx.fillText('Govt of Kerala • Department of Health Services • Migrant Health Cell', 40, 80);
-
-  // Patient Info Line
-  ctx.fillStyle = '#1E293B';
-  ctx.font = 'bold 18px sans-serif';
-  ctx.fillText('Dr. P.K. Thomas, MD (General Medicine) [KMC-88214]', 40, 160);
-  ctx.font = '15px sans-serif';
-  ctx.fillText('Patient: Ramesh Kumar | Age: 28/M | Date: Today | District: Ernakulam', 40, 190);
-
-  ctx.strokeStyle = '#CBD5E1';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(40, 210);
-  ctx.lineTo(760, 210);
-  ctx.stroke();
-
-  // Rx Section
-  ctx.fillStyle = '#0D5C52';
-  ctx.font = 'bold 36px serif';
-  ctx.fillText('℞', 40, 260);
-
-  ctx.fillStyle = '#0F172A';
-  ctx.font = 'bold 20px monospace';
-
-  if (sampleType === 'fever') {
-    ctx.fillText('Diagnosis: Acute Viral Pyrexia & Bronchitis', 90, 260);
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('1. Tab Paracetamol 650mg (Dolo 650) -- 1 tab TDS pc x 3 days', 60, 320);
-    ctx.fillText('2. Tab Amoxicillin Clav 625mg (Augmentin) -- 1 tab BD pc x 5 days', 60, 380);
-    ctx.fillText('3. Tab Cetirizine 10mg (Allegra/Cetzine) -- 1 tab HS x 5 days', 60, 440);
-    ctx.fillText('4. Tab Pantoprazole 40mg (Pan 40) -- 1 tab OD ac x 5 days', 60, 500);
-  } else {
-    ctx.fillText('Diagnosis: Upper Respiratory Tract Infection', 90, 260);
-    ctx.font = 'bold 18px monospace';
-    ctx.fillText('1. Tab Azithromycin 500mg (Azee) -- 1 tab OD ac x 3 days', 60, 320);
-    ctx.fillText('2. Tab Paracetamol 650mg -- 1 tab TDS pc x 3 days', 60, 380);
-    ctx.fillText('3. Tab Pantoprazole 40mg -- 1 tab OD ac x 5 days', 60, 440);
-  }
-
-  // Doctor signature
-  ctx.fillStyle = '#0D5C52';
-  ctx.font = 'italic 20px cursive';
-  ctx.fillText('Dr. P.K. Thomas', 580, 700);
-  ctx.font = '14px sans-serif';
-  ctx.fillText('Signed & Verified (KMC)', 580, 725);
-
-  return canvas.toDataURL('image/png');
-};
 
 export const TabAiScanner = () => {
   const { 
     activeSession, 
-    activePrescription, 
-    setActivePrescription, 
     setIsHospitalModalOpen, 
     setIsJanAushadhiModalOpen,
-    setActiveDashboardTab,
     showToast,
     t 
   } = useApp();
+  
+  const navigate = useNavigate();
 
   const worker = activeSession?.user;
   const activeDistrict = worker?.district || worker?.keralaDistrict || 'Ernakulam';
@@ -190,11 +23,19 @@ export const TabAiScanner = () => {
   // Scanner States: 'viewfinder' | 'processing' | 'result'
   const [scannerView, setScannerView] = useState('viewfinder');
   const [ocrProgress, setOcrProgress] = useState(0);
-  const [ocrStatusText, setOcrStatusText] = useState('Initializing AI OCR Engine...');
-  const [rawExtractedText, setRawExtractedText] = useState('');
+  const [uploadedImage, setUploadedImage] = useState(null);
+  
+  const [rawJsonData, setRawJsonData] = useState(null);
   const [showRawText, setShowRawText] = useState(false);
+  
+  // Editable form state for the parsed prescription
+  const [formRx, setFormRx] = useState(null);
+  
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [speakingId, setSpeakingId] = useState(null);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -243,12 +84,9 @@ export const TabAiScanner = () => {
     } else {
       stopCamera();
     }
-    return () => {
-      stopCamera();
-    };
+    return () => stopCamera();
   }, [scannerView]);
 
-  // Capture current camera video frame onto canvas and process
   const handleCaptureVideoFrame = () => {
     if (!videoRef.current) return;
     const video = videoRef.current;
@@ -258,101 +96,68 @@ export const TabAiScanner = () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/png');
-    processImageWithTesseract(dataUrl);
+    processImageWithGemini(dataUrl);
   };
 
-  // Real client-side OCR with Tesseract.js
-  const processImageWithTesseract = async (imageSource) => {
+  const processImageWithGemini = async (imageSource) => {
     stopCamera();
+    setUploadedImage(imageSource);
     setScannerView('processing');
-    setOcrProgress(0);
-    setOcrStatusText('Loading Tesseract OCR Optical Models...');
+    setOcrProgress(20);
 
     try {
-      const result = await Tesseract.recognize(
-        imageSource,
-        'eng',
-        {
-          logger: (m) => {
-            if (m.status === 'recognizing text') {
-              const p = Math.round((m.progress || 0) * 100);
-              setOcrProgress(p);
-              setOcrStatusText(`Extracting clinical text via AI Vision... ${p}%`);
-            } else if (m.status) {
-              setOcrStatusText(`${m.status.charAt(0).toUpperCase() + m.status.slice(1)}...`);
-            }
-          }
-        }
-      );
+      const fetchRes = await fetch(imageSource);
+      const blob = await fetchRes.blob();
+      
+      const formData = new FormData();
+      formData.append('image', blob, 'prescription.jpg');
 
-      const extractedText = result?.data?.text || '';
-      setRawExtractedText(extractedText);
-      parseAndSetPrescription(extractedText);
-    } catch (err) {
-      console.error('Tesseract OCR Error:', err);
-      // Graceful fallback to parsed sample
-      const fallbackText = "Aluva Taluk Hospital\nRx Paracetamol 650mg TDS\nAugmentin 625mg BD\nCetirizine 10mg HS";
-      setRawExtractedText(fallbackText);
-      parseAndSetPrescription(fallbackText);
-    }
-  };
+      setOcrProgress(60);
 
-  // Parse extracted OCR text dynamically against generic medicine dictionary
-  const parseAndSetPrescription = (text) => {
-    const lowerText = text.toLowerCase();
-    const matchedMedicines = [];
+      const response = await fetch('http://localhost:5000/api/ocr/scan-prescription', {
+        method: 'POST',
+        body: formData,
+      });
 
-    // Search catalog
-    GENERIC_CATALOG.forEach((item, idx) => {
-      const hasMatch = item.keywords.some((kw) => lowerText.includes(kw));
-      if (hasMatch) {
-        matchedMedicines.push({
-          id: `OCR-MED-${idx + 1}`,
-          ...item
-        });
+      if (!response.ok) {
+        throw new Error('Processing failed');
       }
-    });
 
-    // If no specific match was found, default to standard URI medicines
-    if (matchedMedicines.length === 0) {
-      matchedMedicines.push(
-        { id: 'OCR-MED-1', ...GENERIC_CATALOG[0] },
-        { id: 'OCR-MED-2', ...GENERIC_CATALOG[1] }
-      );
+      setOcrProgress(80);
+      const json = await response.json();
+      
+      setOcrProgress(100);
+      setRawJsonData(json.data);
+      
+      const parsedMeds = Array.isArray(json.data.medicines) 
+        ? json.data.medicines.map(m => ({
+            name: m.name || m.genericName || '',
+            dosage: m.dosage || m.strength || '',
+            frequency: m.frequency || '',
+            duration: m.duration || '',
+            instructions: m.instructions || '',
+            confidence: m.confidence || 'medium'
+          })) 
+        : [];
+
+      setFormRx({
+        patientName: json.data.patientName || '',
+        doctorName: json.data.doctorName || '',
+        date: json.data.prescriptionDate || new Date().toISOString().split('T')[0],
+        diagnosis: json.data.diagnosis || '',
+        reportedSymptoms: json.data.reportedSymptoms || '',
+        overallConfidence: json.data.overallConfidence || 'medium',
+        medicines: parsedMeds
+      });
+      
+      setSavedSuccess(false);
+      setScannerView('result');
+      showToast('Prescription recognized!', 'success');
+    } catch (err) {
+      console.error('OCR Error:', err);
+      showToast('We couldn\'t read this prescription. Please try a clearer image.', 'error');
+      setScannerView('viewfinder');
     }
-
-    // Calculate dynamic pricing
-    const totalBranded = matchedMedicines.reduce((acc, m) => acc + m.brandedPrice, 0);
-    const totalJanAushadhi = matchedMedicines.reduce((acc, m) => acc + m.janAushadhiPrice, 0);
-    const totalSavings = totalBranded - totalJanAushadhi;
-    const savingsPercent = Math.round((totalSavings / totalBranded) * 100);
-
-    // Detect diagnosis
-    let detectedDiagnosis = 'Acute Viral Pyrexia & Bronchial Irritation';
-    if (lowerText.includes('infection') || lowerText.includes('urti')) {
-      detectedDiagnosis = 'Upper Respiratory Tract Infection (Worksite Exposure)';
-    } else if (lowerText.includes('fever') || lowerText.includes('pyrexia')) {
-      detectedDiagnosis = 'Acute Viral Fever & Bodyache';
-    }
-
-    const dynamicRx = {
-      id: `RX-REAL-${Date.now()}`,
-      title: 'Digitized Doctor Prescription (OCR Verified)',
-      doctorName: 'Dr. P.K. Thomas, MD [KMC-88214]',
-      hospitalName: `${activeDistrict} Taluk Headquarters Hospital`,
-      date: 'Today',
-      diagnosis: detectedDiagnosis,
-      awazEligible: true,
-      awazCoverageStatus: '100% Cashless Covered under Kerala AWAZ Scheme',
-      medicines: matchedMedicines,
-      totalBrandedCost: `₹${totalBranded.toFixed(2)}`,
-      totalJanAushadhiCost: `₹${totalJanAushadhi.toFixed(2)}`,
-      totalSaved: `₹${totalSavings.toFixed(2)} (${savingsPercent}% Savings)`
-    };
-
-    setActivePrescription(dynamicRx);
-    setScannerView('result');
-    showToast('Prescription successfully recognized & parsed with AI OCR!', 'success');
   };
 
   const handleFileUpload = (e) => {
@@ -361,21 +166,90 @@ export const TabAiScanner = () => {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          processImageWithTesseract(event.target.result);
+          processImageWithGemini(event.target.result);
         }
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSampleClick = (sampleType) => {
-    const sampleDataUrl = createSamplePrescriptionCanvas(sampleType);
-    processImageWithTesseract(sampleDataUrl);
+  const handleSaveToDatabase = async () => {
+    if (!worker?.id) return;
+    
+    setIsSaving(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/workers/${worker.id}/prescriptions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formRx)
+      });
+      
+      if (!response.ok) throw new Error('Failed to save to database');
+      
+      setSavedSuccess(true);
+      showToast('Prescription saved securely.', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Error saving prescription', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSyncPills = () => {
-    showToast(t('alertRxAddedToPills'), 'success');
-    setActiveDashboardTab('pills');
+  const handleMedicineChange = (idx, field, value) => {
+    const newMeds = [...formRx.medicines];
+    newMeds[idx] = { ...newMeds[idx], [field]: value };
+    setFormRx({ ...formRx, medicines: newMeds });
+  };
+
+  const addMedicine = () => {
+    setFormRx({
+      ...formRx, 
+      medicines: [...formRx.medicines, { name: '', dosage: '', frequency: '', duration: '', instructions: '' }]
+    });
+  };
+
+  const removeMedicine = (idx) => {
+    const newMeds = formRx.medicines.filter((_, i) => i !== idx);
+    setFormRx({ ...formRx, medicines: newMeds });
+  };
+
+  const playAudio = (med, idx) => {
+    if (!('speechSynthesis' in window)) {
+      showToast('Voice playback is unavailable on this device.', 'error');
+      return;
+    }
+    
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+    setSpeakingId(idx);
+
+    let text = `Medicine: ${med.name}. `;
+    if (med.dosage) text += `Take ${med.dosage}. `;
+    if (med.frequency) text += `${med.frequency}. `;
+    if (med.duration) text += `For ${med.duration}. `;
+    if (med.instructions) text += `${med.instructions}.`;
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Try to match language
+    let lang = 'en-IN';
+    if (worker?.audioLanguage === 'hi') lang = 'hi-IN';
+    if (worker?.audioLanguage === 'ml') lang = 'ml-IN';
+    if (worker?.audioLanguage === 'bn') lang = 'bn-IN';
+    
+    utterance.lang = lang;
+    
+    utterance.onend = () => {
+      setSpeakingId(null);
+    };
+    
+    utterance.onerror = () => {
+      setSpeakingId(null);
+      showToast('Audio playback failed.', 'error');
+    };
+
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -389,32 +263,26 @@ export const TabAiScanner = () => {
             <div>
               <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 text-xs font-bold uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Client-Side Tesseract.js AI Vision</span>
+                <span>AI Prescription Scanner</span>
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-slate-900">
-                {t('scannerHeaderTitle')}
+                Scan Your Prescription
               </h2>
-              <p className="text-xs md:text-sm text-slate-500 mt-0.5">
-                {t('scannerHeaderSub')}
-              </p>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <label className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors">
-                <Upload className="w-4 h-4" />
-                <span>Upload Image</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
+            <label className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer transition-colors">
+              <Upload className="w-4 h-4" />
+              <span>Upload Image</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
           </div>
 
-          {/* Camera Viewfinder Area */}
-          <div className="relative w-full aspect-[4/3] md:aspect-[16/9] max-h-[360px] bg-slate-950 rounded-xl overflow-hidden shadow-inner flex items-center justify-center border border-slate-800">
+          <div className="relative w-full aspect-[4/3] md:aspect-[16/9] max-h-[400px] bg-slate-950 rounded-xl overflow-hidden shadow-inner flex items-center justify-center border border-slate-800">
             {!cameraError ? (
               <video
                 ref={videoRef}
@@ -426,276 +294,326 @@ export const TabAiScanner = () => {
               <div className="text-center p-6 text-slate-400 space-y-3">
                 <FileText className="w-10 h-10 mx-auto text-amber-400" />
                 <p className="text-xs max-w-xs mx-auto">
-                  Camera feed unavailable on this browser. Upload a prescription photo or try our interactive clinical samples below.
+                  Camera feed unavailable. Please upload a photo of your prescription.
                 </p>
               </div>
             )}
-
-            {/* Target Reticle Overlays */}
-            <div className="absolute inset-4 pointer-events-none flex flex-col justify-between">
-              <div className="flex justify-between">
-                <div className="w-6 h-6 border-t-2 border-l-2 border-amber-400 rounded-tl"></div>
-                <div className="w-6 h-6 border-t-2 border-r-2 border-amber-400 rounded-tr"></div>
-              </div>
-
-              <div className="self-center">
-                <span className="px-3 py-1 rounded-md bg-slate-900/80 text-[11px] font-semibold text-amber-300 border border-amber-400/30">
-                  {t('scannerInstruction')}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <div className="w-6 h-6 border-b-2 border-l-2 border-amber-400 rounded-bl"></div>
-                <div className="w-6 h-6 border-b-2 border-r-2 border-amber-400 rounded-br"></div>
-              </div>
-            </div>
           </div>
 
-          {/* Capture Action & Interactive Samples */}
-          <div className="mt-5 space-y-4">
+          <div className="mt-5">
             <button
               type="button"
               onClick={handleCaptureVideoFrame}
-              className="w-full py-3.5 px-6 rounded-lg bg-teal-800 hover:bg-teal-900 active:bg-teal-950 text-white font-bold text-sm uppercase tracking-wider shadow-sm transition-all flex items-center justify-center space-x-2"
+              disabled={cameraError}
+              className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm uppercase tracking-wider shadow-sm transition-all flex items-center justify-center space-x-2 ${
+                cameraError 
+                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  : 'bg-teal-800 hover:bg-teal-900 text-white'
+              }`}
             >
-              <Camera className="w-4 h-4" />
-              <span>Capture & Run Tesseract OCR</span>
+              <Camera className="w-5 h-5" />
+              <span>Capture Prescription</span>
             </button>
-
-            {/* Interactive Clinical Prescriptions (Instant Testing) */}
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                ⚡ Instant Demo: Test Real OCR with Doctor Prescriptions:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleSampleClick('fever')}
-                  className="p-2.5 rounded-lg bg-white hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-left transition-colors flex items-center justify-between text-xs font-semibold text-slate-800"
-                >
-                  <div>
-                    <span className="font-bold block text-slate-900">Rx 1: Fever & Infection (Aluva Hospital)</span>
-                    <span className="text-[10px] text-slate-500">Paracetamol, Augmentin, Cetirizine, Pan 40</span>
-                  </div>
-                  <Zap className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSampleClick('chest')}
-                  className="p-2.5 rounded-lg bg-white hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-left transition-colors flex items-center justify-between text-xs font-semibold text-slate-800"
-                >
-                  <div>
-                    <span className="font-bold block text-slate-900">Rx 2: Respiratory Infection</span>
-                    <span className="text-[10px] text-slate-500">Azithromycin 500mg, Paracetamol, Pan 40</span>
-                  </div>
-                  <Zap className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW 2: REAL TESSERACT.JS PROGRESS BAR                                    */}
+      {/* VIEW 2: PROFESSIONAL PROGRESS UI                                          */}
       {/* ========================================================================= */}
       {scannerView === 'processing' && (
-        <div className="bg-white rounded-xl p-8 md:p-12 text-center shadow-sm border border-slate-200 max-w-xl mx-auto">
-          <div className="w-14 h-14 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mx-auto mb-4 animate-pulse">
+        <div className="bg-white rounded-xl p-8 md:p-12 shadow-sm border border-slate-200 max-w-xl mx-auto">
+          <div className="w-14 h-14 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center mx-auto mb-6 animate-pulse">
             <Sparkles className="w-7 h-7" />
           </div>
-
-          <h3 className="text-lg md:text-xl font-bold text-slate-900">
-            Processing Prescription via Tesseract.js
+          <h3 className="text-xl font-bold text-slate-900 text-center mb-6">
+            Analyzing Prescription
           </h3>
-          <p className="text-xs text-slate-500 mt-1">
-            {ocrStatusText}
-          </p>
-
-          {/* Progress Bar */}
-          <div className="mt-6">
-            <div className="flex justify-between text-xs font-semibold text-slate-600 mb-1.5 font-mono">
-              <span>OCR Progress</span>
-              <span className="font-bold text-teal-800">{ocrProgress}%</span>
+          <div className="space-y-4 max-w-sm mx-auto text-sm font-medium text-slate-600">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              <span>Image uploaded securely</span>
             </div>
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-teal-700 transition-all duration-200 rounded-full"
-                style={{ width: `${ocrProgress}%` }}
-              ></div>
+            <div className="flex items-center gap-3">
+              {ocrProgress >= 60 ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <div className="w-5 h-5 rounded-full border-2 border-slate-200"></div>}
+              <span className={ocrProgress >= 60 ? "text-slate-900" : "text-slate-400"}>Prescription detected</span>
+            </div>
+            <div className="flex items-center gap-3">
+              {ocrProgress >= 80 ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : ocrProgress >= 60 ? <div className="w-5 h-5 rounded-full border-2 border-teal-500 border-t-transparent animate-spin"></div> : <div className="w-5 h-5 rounded-full border-2 border-slate-200"></div>}
+              <span className={ocrProgress >= 80 ? "text-slate-900" : ocrProgress >= 60 ? "text-teal-700 font-bold" : "text-slate-400"}>Reading medicines</span>
+            </div>
+            <div className="flex items-center gap-3">
+              {ocrProgress >= 100 ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : ocrProgress >= 80 ? <div className="w-5 h-5 rounded-full border-2 border-teal-500 border-t-transparent animate-spin"></div> : <div className="w-5 h-5 rounded-full border-2 border-slate-200"></div>}
+              <span className={ocrProgress >= 100 ? "text-slate-900" : ocrProgress >= 80 ? "text-teal-700 font-bold" : "text-slate-400"}>Structuring data</span>
             </div>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW 3: DYNAMIC RECOGNITION RESULTS & SAVINGS MATCHER                     */}
+      {/* VIEW 3: DYNAMIC RECOGNITION RESULTS (TWO COLUMN)                          */}
       {/* ========================================================================= */}
-      {scannerView === 'result' && activePrescription && (
-        <div className="space-y-6">
-          {/* Header Bar */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[11px] font-bold uppercase tracking-wider mb-1">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>OCR Recognition Complete</span>
-              </div>
-              <h2 className="text-lg md:text-xl font-bold text-slate-900">
-                {activePrescription.title}
-              </h2>
-              <span className="text-xs text-slate-500 block mt-0.5">
-                {activePrescription.doctorName} • {activePrescription.hospitalName}
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <button
-                type="button"
-                onClick={() => setShowRawText(!showRawText)}
-                className="inline-flex items-center space-x-1 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>{showRawText ? 'Hide Raw OCR' : 'View Raw OCR Text'}</span>
-              </button>
-
-              <button
-                type="button"
+      {scannerView === 'result' && formRx && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          
+          {/* LEFT: IMAGE PREVIEW */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm lg:sticky lg:top-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-bold text-slate-900 text-sm">Prescription Preview</h3>
+              <button 
                 onClick={() => setScannerView('viewfinder')}
-                className="inline-flex items-center space-x-1 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+                className="text-xs font-semibold text-teal-700 hover:text-teal-800 flex items-center"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Scan Another</span>
+                <RotateCcw className="w-3.5 h-3.5 mr-1" /> Replace Image
               </button>
+            </div>
+            <div className="relative rounded-lg overflow-hidden border border-slate-200 bg-slate-100 group">
+              <img src={uploadedImage} alt="Uploaded Prescription" className="w-full h-auto object-contain max-h-[600px]" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <a href={uploadedImage} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition">
+                  <Maximize2 className="w-6 h-6" />
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Raw OCR Text Box (Collapsible) */}
-          {showRawText && (
-            <div className="p-4 rounded-xl bg-slate-900 text-emerald-300 font-mono text-xs overflow-x-auto border border-slate-800">
-              <span className="text-slate-400 block text-[10px] uppercase tracking-wider mb-1">
-                Raw Extracted OCR Output (Tesseract.js):
-              </span>
-              <pre className="whitespace-pre-wrap">{rawExtractedText || 'No text parsed.'}</pre>
-            </div>
-          )}
-
-          {/* 1. AWAZ Scheme Checker */}
-          <div className="bg-white rounded-xl border border-emerald-200 shadow-sm p-5 md:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-              <div>
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
-                  {t('resultDiagnosis')}
-                </span>
-                <h3 className="text-base md:text-lg font-bold text-slate-900 mt-0.5">
-                  {activePrescription.diagnosis}
-                </h3>
-              </div>
-
-              <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center space-x-1.5 self-start sm:self-auto">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>100% Free under AWAZ Scheme</span>
-              </span>
-            </div>
-
-            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <p className="text-xs text-slate-600 max-w-xl">
-                {t('awazFreeDesc')}
-              </p>
-              <button
-                type="button"
-                onClick={() => setIsHospitalModalOpen(true)}
-                className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center space-x-1.5 flex-shrink-0"
-              >
-                <Building2 className="w-4 h-4" />
-                <span>{t('btnFindAwazHospitals')} {activeDistrict}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 2. Jan Aushadhi Generic Savings Matcher */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-              <div>
-                <div className="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300 text-[10px] font-bold uppercase mb-1">
-                  <Pill className="w-3 h-3" />
-                  <span>PM Jan Aushadhi Generic Matcher</span>
+          {/* RIGHT: EXTRACTED DATA & EDIT */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+              <div className="mb-4 pb-4 border-b border-slate-100">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    Extracted Prescription
+                  </h2>
+                  <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded-md border ${
+                    formRx.overallConfidence === 'low' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                    formRx.overallConfidence === 'high' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                    'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}>
+                    OCR Confidence: {formRx.overallConfidence}
+                  </span>
                 </div>
-                <h3 className="text-base md:text-lg font-bold text-slate-900">
-                  {t('janAushadhiTitle')}
-                </h3>
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-lg flex items-start gap-2">
+                  <span className="text-lg">⚠️</span>
+                  <p className="font-medium">Please verify all handwritten medicine names and doses against the original prescription.</p>
+                </div>
               </div>
 
-              <div className="px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-right">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 block">
-                  Total Savings
-                </span>
-                <span className="text-base font-black font-mono">{activePrescription.totalSaved}</span>
-              </div>
-            </div>
-
-            {/* Extracted Medicines List */}
-            <div className="mt-4 space-y-2.5">
-              {activePrescription.medicines.map((med) => (
-                <div
-                  key={med.id}
-                  className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-3"
-                >
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs md:text-sm font-bold text-slate-900">
-                        {med.genericName}
-                      </span>
-                      <span className="px-2 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        Generic
-                      </span>
-                    </div>
-                    <span className="text-xs text-slate-500 block mt-0.5">
-                      Branded Rx: <strong>{med.brandedName}</strong> • {med.dosage}
-                    </span>
-                    <span className="text-[11px] text-teal-800 font-semibold block mt-0.5">
-                      🕒 {med.timing}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center space-x-3 text-right">
-                    <div>
-                      <span className="text-[10px] text-slate-400 line-through block font-mono">
-                        ₹{med.brandedPrice.toFixed(2)}
-                      </span>
-                      <span className="text-xs md:text-sm font-bold text-emerald-800 font-mono block">
-                        ₹{med.janAushadhiPrice.toFixed(2)}
-                      </span>
-                    </div>
-
-                    <span className="px-2 py-1 rounded bg-emerald-100 text-emerald-900 text-[11px] font-bold">
-                      Save ₹{(med.brandedPrice - med.janAushadhiPrice).toFixed(2)}
-                    </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patient on Prescription</label>
+                  <input
+                    type="text"
+                    value={formRx.patientName || ''}
+                    onChange={(e) => setFormRx({...formRx, patientName: e.target.value})}
+                    placeholder="Not clearly read"
+                    className="w-full px-2 py-1.5 rounded-md border border-slate-300 text-sm font-semibold text-slate-800 bg-white"
+                  />
+                  <div className="mt-2 text-[10px] text-slate-500">
+                    Linked Worker: <strong className="text-teal-700">{worker?.name || 'Ramesh Kumar'}</strong>
                   </div>
                 </div>
-              ))}
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Doctor Name</label>
+                  <input
+                    type="text"
+                    value={formRx.doctorName || ''}
+                    onChange={(e) => setFormRx({...formRx, doctorName: e.target.value})}
+                    className="w-full px-2 py-1.5 rounded-md border border-slate-300 text-sm font-semibold bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Diagnosis</label>
+                  <input
+                    type="text"
+                    value={formRx.diagnosis || ''}
+                    onChange={(e) => setFormRx({...formRx, diagnosis: e.target.value})}
+                    placeholder="Not explicitly mentioned"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Reported Symptoms</label>
+                  <input
+                    type="text"
+                    value={formRx.reportedSymptoms || ''}
+                    onChange={(e) => setFormRx({...formRx, reportedSymptoms: e.target.value})}
+                    placeholder="None read from prescription"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <h3 className="text-sm font-bold text-slate-800">Medicines Found</h3>
+                  <button onClick={addMedicine} className="text-xs font-bold text-teal-600 flex items-center">
+                    <Plus className="w-4 h-4 mr-1" /> Add Medicine
+                  </button>
+                </div>
+                
+                {formRx.medicines.map((med, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl border ${med.confidence === 'low' ? 'bg-amber-50/50 border-amber-300' : 'bg-slate-50 border-slate-200'} relative`}>
+                    
+                    <div className="absolute top-3 right-3 flex gap-2 items-center">
+                      {med.confidence === 'low' && (
+                        <span className="flex items-center text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded">
+                          ⚠️ Please Verify
+                        </span>
+                      )}
+                      <button 
+                        onClick={() => playAudio(med, idx)}
+                        className={`p-1.5 rounded-md transition-colors ${speakingId === idx ? 'bg-amber-100 text-amber-700' : 'bg-white border border-slate-200 text-slate-500 hover:text-teal-700'}`}
+                        title="Listen to Instructions"
+                      >
+                        <Volume2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => removeMedicine(idx)} className="p-1.5 bg-white border border-slate-200 text-rose-500 rounded-md hover:bg-rose-50">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Medicine Name</label>
+                        <input
+                          type="text"
+                          value={med.name || ''}
+                          onChange={(e) => handleMedicineChange(idx, 'name', e.target.value)}
+                          className={`w-full px-3 py-2 rounded-md border text-sm font-semibold ${med.confidence === 'low' ? 'border-amber-400 focus:border-amber-500 focus:ring-amber-500' : 'border-slate-200'}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Dosage / Strength</label>
+                        <input
+                          type="text"
+                          value={med.dosage || ''}
+                          onChange={(e) => handleMedicineChange(idx, 'dosage', e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border border-slate-200 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 mt-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Frequency</label>
+                        <input
+                          type="text"
+                          value={med.frequency || ''}
+                          onChange={(e) => handleMedicineChange(idx, 'frequency', e.target.value)}
+                          className={`w-full px-3 py-2 rounded-md border text-sm ${med.confidence === 'low' ? 'border-amber-300' : 'border-slate-200'}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Duration</label>
+                        <input
+                          type="text"
+                          value={med.duration || ''}
+                          onChange={(e) => handleMedicineChange(idx, 'duration', e.target.value)}
+                          className={`w-full px-3 py-2 rounded-md border text-sm ${med.confidence === 'low' ? 'border-amber-300' : 'border-slate-200'}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Instructions</label>
+                        <input
+                          type="text"
+                          value={med.instructions || ''}
+                          onChange={(e) => handleMedicineChange(idx, 'instructions', e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border border-slate-200 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {formRx.medicines.length === 0 && (
+                  <p className="text-sm text-slate-500 italic text-center p-4">No medicines clearly identified.</p>
+                )}
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-100">
+                {!savedSuccess ? (
+                  <button
+                    type="button"
+                    onClick={handleSaveToDatabase}
+                    disabled={isSaving}
+                    className="w-full py-3.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm uppercase tracking-wider flex items-center justify-center transition-colors shadow-md"
+                  >
+                    {isSaving ? (
+                      <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-5 h-5 mr-2" />
+                        Confirm & Save Prescription
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center text-emerald-800">
+                      <CheckCircle2 className="w-6 h-6 mr-3" />
+                      <div>
+                        <p className="font-bold text-sm">Successfully Saved</p>
+                        <p className="text-xs">Your prescription has been digitized and saved securely.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Actions: Find Pharmacy & Sync to Pill-Clock */}
-            <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => setIsJanAushadhiModalOpen(true)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center space-x-1.5"
-              >
-                <Pill className="w-4 h-4" />
-                <span>{t('btnFindJanAushadhi')} {activeDistrict}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleSyncPills}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-teal-800 hover:bg-teal-900 text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center space-x-1.5"
-              >
-                <Clock className="w-4 h-4" />
-                <span>{t('btnSyncToPillClock')}</span>
-              </button>
-            </div>
+            {/* CARE NEAR YOU / AFFORDABLE MEDS */}
+            {savedSuccess && (
+              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h3 className="font-bold text-slate-900">Care Near You</h3>
+                  <p className="text-xs text-slate-500 mt-1">Based on the prescription and reported symptoms, here are nearby healthcare facilities in your district.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-white border border-emerald-200">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="p-2 bg-emerald-100 rounded-lg text-emerald-700">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm">Government Hospital</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Verified public healthcare facility in {activeDistrict}.</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setIsHospitalModalOpen(true)}
+                      className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold"
+                    >
+                      Find Nearest Facility
+                    </button>
+                  </div>
+                  
+                  <div className="p-4 rounded-xl bg-white border border-amber-200">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="p-2 bg-amber-100 rounded-lg text-amber-700">
+                        <Pill className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm">Affordable Medicines</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">Jan Aushadhi stores offering generic equivalents.</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setIsJanAushadhiModalOpen(true)}
+                      className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold"
+                    >
+                      Locate Jan Aushadhi
+                    </button>
+                  </div>
+                </div>
+                <p className="text-[10px] text-slate-400 italic text-center mt-2">
+                  A generic equivalent may be available. Please confirm with your doctor or pharmacist before substitution.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

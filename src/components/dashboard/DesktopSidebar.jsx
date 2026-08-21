@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { 
   QrCode, 
@@ -17,8 +18,6 @@ import {
 
 export const DesktopSidebar = ({ onReturnHome }) => {
   const { 
-    activeDashboardTab, 
-    setActiveDashboardTab, 
     activeSession, 
     setIsHospitalModalOpen, 
     setIsJanAushadhiModalOpen,
@@ -32,30 +31,29 @@ export const DesktopSidebar = ({ onReturnHome }) => {
 
   const navItems = [
     {
-      id: 'passport',
-      label: t('dashTabPassport'),
+      id: 'home',
+      label: 'Home',
+      subLabel: 'Welfare & Wallet',
+      icon: ShieldCheck,
+    },
+    {
+      id: 'health-id',
+      label: 'Health ID',
       subLabel: 'ABHA & Digital ID',
       icon: QrCode,
     },
     {
-      id: 'scanner',
-      label: t('dashTabScanner'),
+      id: 'medicines',
+      label: 'Medicines',
       subLabel: 'Real AI OCR Engine',
       badge: 'Tesseract',
       icon: Camera,
     },
     {
-      id: 'pills',
-      label: t('dashTabPills'),
+      id: 'care',
+      label: 'Care',
       subLabel: 'Voice Guidance Audio',
       icon: Clock,
-    },
-    {
-      id: 'wallet',
-      label: t('dashTabWallet'),
-      subLabel: 'AWAZ Insurance Ledger',
-      badge: '₹50,000',
-      icon: ShieldCheck,
     },
   ];
 
@@ -111,42 +109,45 @@ export const DesktopSidebar = ({ onReturnHome }) => {
 
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeDashboardTab === item.id;
 
           return (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => setActiveDashboardTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all duration-150 group ${
+              to={`/worker/${item.id}`}
+              className={({ isActive }) => `w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all duration-150 group ${
                 isActive
                   ? 'bg-teal-800 text-white font-bold shadow-sm'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold'
               }`}
             >
-              <div className="flex items-center space-x-3 min-w-0">
-                <Icon
-                  className={`w-4 h-4 flex-shrink-0 transition-transform ${
-                    isActive ? 'text-amber-300 scale-110' : 'text-slate-400 group-hover:text-slate-700'
-                  }`}
-                />
-                <div className="truncate">
-                  <span className="text-xs block leading-tight truncate">
-                    {item.label}
-                  </span>
-                  <span className={`text-[10px] block truncate ${isActive ? 'text-teal-200' : 'text-slate-400'}`}>
-                    {item.subLabel}
-                  </span>
-                </div>
-              </div>
+              {({ isActive }) => (
+                <>
+                  <div className="flex items-center space-x-3 min-w-0">
+                    <Icon
+                      className={`w-4 h-4 flex-shrink-0 transition-transform ${
+                        isActive ? 'text-amber-300 scale-110' : 'text-slate-400 group-hover:text-slate-700'
+                      }`}
+                    />
+                    <div className="truncate">
+                      <span className="text-xs block leading-tight truncate">
+                        {item.label}
+                      </span>
+                      <span className={`text-[10px] block truncate ${isActive ? 'text-teal-200' : 'text-slate-400'}`}>
+                        {item.subLabel}
+                      </span>
+                    </div>
+                  </div>
 
-              {item.badge && (
-                <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md ${
-                  isActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-700'
-                }`}>
-                  {item.badge}
-                </span>
+                  {item.badge && (
+                    <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md ${
+                      isActive ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
-            </button>
+            </NavLink>
           );
         })}
 

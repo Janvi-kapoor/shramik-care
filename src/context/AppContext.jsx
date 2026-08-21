@@ -1,33 +1,40 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { 
-  INITIAL_WORKERS, 
-  INITIAL_DOCTORS, 
-  INITIAL_ADMIN,
-  MOCK_PRESCRIPTION_SCANS,
-  DAILY_PILL_SCHEDULE 
-} from '../data/mockDatabase';
+import { useNavigate } from 'react-router-dom';
+import { MOCK_PRESCRIPTION_SCANS } from '../data/mockDatabase';
 import { TRANSLATIONS } from '../data/translations';
+import { fallbackTranslations } from '../utils/clinicalAudioBackup';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+  const navigate = useNavigate();
+
   // 1. Language State
   const [currentLanguage, setCurrentLanguage] = useState(() => {
     return localStorage.getItem('shramik_lang') || 'en';
   });
 
-  // 2. Database State (with localStorage persistence)
-  const [workers, setWorkers] = useState(() => {
-    try {
-      const saved = localStorage.getItem('shramik_workers');
-      return saved ? JSON.parse(saved) : INITIAL_WORKERS;
-    } catch {
-      return INITIAL_WORKERS;
-    }
-  });
+  // 2. Database State (now fetched from backend)
+  const [workers, setWorkers] = useState([]);
 
-  const [doctors] = useState(INITIAL_DOCTORS);
-  const [admin] = useState(INITIAL_ADMIN);
+  useEffect(() => {
+    const fetchWorkers = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/workers');
+        if (res.ok) {
+          const data = await res.json();
+          setWorkers(data);
+          
+          if (data.length > 0) {
+            setSelectedPatient(prev => prev || data[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch initial workers from server:', err);
+      }
+    };
+    fetchWorkers();
+  }, []);
 
   // 3. Active Session (worker | doctor | admin | null)
   const [activeSession, setActiveSession] = useState(() => {
@@ -39,8 +46,7 @@ export const AppProvider = ({ children }) => {
     }
   });
 
-  // 4. Worker Dashboard States
-  const [activeDashboardTab, setActiveDashboardTab] = useState('passport'); // 'passport' | 'scanner' | 'pills' | 'wallet'
+  // 4. Modal / Local States
   const [isHospitalModalOpen, setIsHospitalModalOpen] = useState(false);
   const [isJanAushadhiModalOpen, setIsJanAushadhiModalOpen] = useState(false);
   const [activePrescription, setActivePrescription] = useState(MOCK_PRESCRIPTION_SCANS[0]);
@@ -56,10 +62,7 @@ export const AppProvider = ({ children }) => {
   });
 
   // 5. Doctor Workstation States
-  const [activeDoctorTab, setActiveDoctorTab] = useState('overview'); // 'overview' | 'patient-lookup' | 'voice-translator' | 'camp-registry'
-  const [selectedPatient, setSelectedPatient] = useState(() => {
-    return workers[0] || INITIAL_WORKERS[0];
-  });
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   // Voice Speech Playing State
   const [isAudioSpeaking, setIsAudioSpeaking] = useState(false);
@@ -70,14 +73,10 @@ export const AppProvider = ({ children }) => {
   const [authModalTab, setAuthModalTab] = useState('worker'); // 'worker' | 'doctor' | 'admin' | 'register'
   const [toast, setToast] = useState(null);
 
-  // Sync to localStorage
+  // localStorage syncs
   useEffect(() => {
     localStorage.setItem('shramik_lang', currentLanguage);
   }, [currentLanguage]);
-
-  useEffect(() => {
-    localStorage.setItem('shramik_workers', JSON.stringify(workers));
-  }, [workers]);
 
   useEffect(() => {
     localStorage.setItem('shramik_pills_adherence', JSON.stringify(pillAdherence));
@@ -135,76 +134,45 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Login handler
-  const login = (role, credentials) => {
-    if (role === 'worker') {
-      const query = (credentials.identifier || '').trim().toLowerCase();
-      const matched = workers.find(
-        (w) =>
-          w.id.toLowerCase() === query ||
-          w.mobile.replace(/\D/g, '') === query.replace(/\D/g, '')
-      );
+  // Real API Login handler
+  const login = async (role, credentials) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, ...credentials })
+      });
 
-      if (matched) {
-        if (!matched.district) matched.district = matched.keralaDistrict || 'Ernakulam';
-        const session = {
-          role: 'worker',
-          user: matched,
-          loginTime: new Date().toISOString()
-        };
-        setActiveSession(session);
-        setActiveDashboardTab('passport');
-        setIsAuthModalOpen(false);
-        showToast(`${t('alertLoginSuccess')} ${matched.name} (${matched.id})`, 'success');
-        return { success: true, user: matched };
+      const data = await response.json();
+      
+      if (!response.ok) {
+        return { success: false, message: data.error || t('alertAuthFailed') };
       }
-      return { success: false, message: t('alertAuthFailed') };
-    }
 
-    if (role === 'doctor') {
-      const docId = (credentials.doctorId || '').trim().toUpperCase();
-      const kmc = (credentials.kmcLicense || '').trim().toUpperCase();
-      const matched = doctors.find(
-        (d) =>
-          d.id.toUpperCase() === docId &&
-          (d.kmcLicense.toUpperCase() === kmc || kmc === 'KMC-88214' || kmc === 'KMC-94301')
-      );
+      const session = {
+        role: role,
+        user: data.user,
+        token: data.token,
+        loginTime: new Date().toISOString()
+      };
+      
+      setActiveSession(session);
+      setIsAuthModalOpen(false);
+      showToast(`${t('alertLoginSuccess')} ${data.user.name}`, 'success');
 
-      if (matched) {
-        const session = {
-          role: 'doctor',
-          user: matched,
-          loginTime: new Date().toISOString()
-        };
-        setActiveSession(session);
-        setIsAuthModalOpen(false);
-        setActiveDoctorTab('overview');
-        setSelectedPatient(workers[0] || INITIAL_WORKERS[0]);
-        showToast(`${t('alertLoginSuccess')} ${matched.name} [${matched.kmcLicense}]`, 'success');
-        return { success: true, user: matched };
+      if (role === 'worker') {
+        navigate('/worker/home');
+      } else if (role === 'doctor') {
+        navigate('/doctor/scanner');
+      } else if (role === 'admin') {
+        navigate('/admin/overview');
       }
-      return { success: false, message: 'Invalid Doctor ID or KMC License number.' };
+      
+      return { success: true, user: data.user };
+    } catch (err) {
+      console.error('Login error:', err);
+      return { success: false, message: 'Server connection failed.' };
     }
-
-    if (role === 'admin') {
-      const offId = (credentials.officerId || '').trim().toUpperCase();
-      const pin = (credentials.pin || '').trim();
-
-      if (offId === admin.id && (pin === admin.pin || pin === '1234')) {
-        const session = {
-          role: 'admin',
-          user: admin,
-          loginTime: new Date().toISOString()
-        };
-        setActiveSession(session);
-        setIsAuthModalOpen(false);
-        showToast(`${t('alertLoginSuccess')} ${admin.name} (${admin.designation})`, 'success');
-        return { success: true, user: admin };
-      }
-      return { success: false, message: 'Invalid Officer ID or 4-digit PIN.' };
-    }
-
-    return { success: false, message: 'Invalid authentication role.' };
   };
 
   // Register new worker
@@ -288,9 +256,8 @@ export const AppProvider = ({ children }) => {
       window.speechSynthesis.cancel();
     }
     setActiveSession(null);
-    setActiveDashboardTab('passport');
-    setActiveDoctorTab('overview');
     showToast('Logged out of ShramikCare session.', 'info');
+    navigate('/');
   };
 
   // Toggle dose taken in Pill-Clock
@@ -328,7 +295,7 @@ export const AppProvider = ({ children }) => {
   };
 
   // Flawless Multilingual Speech Engine (Bengali, Malayalam, Hindi, English)
-  const speakText = (text, slotId = null, forcedLang = null) => {
+  const speakText = async (text, slotId = null, forcedLang = null, skipTranslation = false) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       showToast('Speech synthesis not supported on this browser.', 'error');
       return;
@@ -339,38 +306,110 @@ export const AppProvider = ({ children }) => {
 
     if (!text || text.trim() === '') return;
 
-    // 2. Configure Utterance with precise BCP-47 Language Tag
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Strict BCP-47 mapping
+    // 2. Strict BCP-47 mapping
     const langCodeMap = {
       hi: 'hi-IN',
       bn: 'bn-IN',
       ml: 'ml-IN',
+      or: 'or-IN',
       en: 'en-IN'
     };
-    const targetLang = forcedLang || langCodeMap[currentLanguage] || 'en-IN';
-    utterance.lang = targetLang;
-    utterance.rate = 0.88; // Clear measured pace for migrant clarity
+    
+    // If forcedLang is already a full tag (e.g. 'ml-IN'), extract the base ('ml')
+    let baseLang = (forcedLang || currentLanguage).split('-')[0];
+    const targetLangTag = langCodeMap[baseLang] || 'en-IN';
+    const targetLangCode = baseLang; // 'hi', 'bn', 'ml', 'en'
+
+    // 3. API Translation or Offline Fallback
+    let textToSpeak = text;
+    
+    if (!skipTranslation && targetLangCode !== 'en') {
+      const cleanText = text.trim();
+      if (fallbackTranslations[cleanText] && fallbackTranslations[cleanText][targetLangTag]) {
+        textToSpeak = fallbackTranslations[cleanText][targetLangTag];
+        setIsAudioSpeaking(true);
+        setCurrentlyPlayingSlot(slotId || 'all');
+      } else {
+        try {
+          // HACK: Unlock speech synthesis in this call stack before awaiting fetch
+        const silentUtterance = new SpeechSynthesisUtterance('');
+        silentUtterance.volume = 0;
+        window.speechSynthesis.speak(silentUtterance);
+
+        setIsAudioSpeaking(true);
+        setCurrentlyPlayingSlot(slotId || 'all');
+        
+        const res = await fetch('http://localhost:5000/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLangCode })
+        });
+        const data = await res.json();
+        if (data.success && data.translatedText) {
+          textToSpeak = data.translatedText;
+        }
+      } catch (err) {
+        console.warn('Failed to translate text via API before speaking:', err);
+      }
+    }
+  }
+
+    // Workaround for browser async speech synthesis blocking
+    // After an await, sometimes speech synthesis is blocked if no prior interaction
+    // We will still attempt to speak.
+    
+    // 4. Configure Utterance
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = targetLangTag;
+    utterance.rate = 0.88;
     utterance.pitch = 1.0;
 
-    // 3. Find matching native voice for the selected language
+    // 5. Loop through available browser voices to find exact matching language voice
     const voices = window.speechSynthesis.getVoices();
-    const primaryLang = targetLang.split('-')[0].toLowerCase();
-    
-    const matchedVoice = voices.find(
-      (v) => 
-        v.lang.toLowerCase() === targetLang.toLowerCase() ||
-        v.lang.replace('_', '-').toLowerCase() === targetLang.toLowerCase() ||
-        v.lang.toLowerCase().startsWith(primaryLang) ||
-        v.name.toLowerCase().includes(primaryLang === 'bn' ? 'bengali' : primaryLang === 'ml' ? 'malayalam' : primaryLang === 'hi' ? 'hindi' : 'english')
-    );
-
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
+    let exactVoice = null;
+    for (let i = 0; i < voices.length; i++) {
+      const v = voices[i];
+      const vLang = v.lang.toLowerCase();
+        if (targetLangTag === 'bn-IN' && (vLang.includes('bn') || vLang.includes('bengali'))) {
+          exactVoice = v;
+          break;
+        }
+        if (targetLangTag === 'ml-IN' && (vLang.includes('ml') || vLang.includes('malayalam'))) {
+          exactVoice = v;
+          break;
+        }
+        if (targetLangTag === 'or-IN' && (vLang.includes('or') || vLang.includes('odia') || vLang.includes('oriya'))) {
+          exactVoice = v;
+          break;
+        }
+        if (targetLangTag === 'hi-IN' && (vLang.includes('hi') || vLang.includes('hindi'))) {
+          exactVoice = v;
+          break;
+        }
+      if (targetLangTag === 'en-IN' && (vLang.includes('en-in') || vLang.includes('english'))) {
+        exactVoice = v;
+        break;
+      }
     }
 
-    // 4. UI Feedback event handlers
+    // 6. Synthetic Fallback Tone
+    if (!exactVoice) {
+       const primaryLang = targetLangTag.split('-')[0].toLowerCase();
+       exactVoice = voices.find(v => v.lang.toLowerCase().startsWith(primaryLang));
+       
+       if (!exactVoice) {
+         utterance.pitch = 0.8;
+         utterance.rate = 0.8;
+         exactVoice = voices.find(v => v.default) || voices[0];
+         console.warn(`[Speech Engine] Missing native voice pack for ${targetLangTag}.`);
+       }
+    }
+
+    if (exactVoice) {
+      utterance.voice = exactVoice;
+    }
+
+    // 7. UI Feedback event handlers
     utterance.onstart = () => {
       setIsAudioSpeaking(true);
       setCurrentlyPlayingSlot(slotId || 'all');
@@ -387,7 +426,7 @@ export const AppProvider = ({ children }) => {
       setCurrentlyPlayingSlot(null);
     };
 
-    // 5. Speak
+    // 8. Speak
     window.speechSynthesis.speak(utterance);
   };
 
@@ -406,8 +445,6 @@ export const AppProvider = ({ children }) => {
         setLanguage,
         t,
         workers,
-        doctors,
-        admin,
         activeSession,
         setActiveSession,
         login,
@@ -420,8 +457,6 @@ export const AppProvider = ({ children }) => {
         toast,
         showToast,
         // Worker Dashboard Features
-        activeDashboardTab,
-        setActiveDashboardTab,
         isHospitalModalOpen,
         setIsHospitalModalOpen,
         isJanAushadhiModalOpen,
@@ -432,10 +467,9 @@ export const AppProvider = ({ children }) => {
         togglePillSlotTaken,
         toggleAwazCardLink,
         // Doctor Workstation Features
-        activeDoctorTab,
-        setActiveDoctorTab,
         selectedPatient,
         setSelectedPatient,
+        // Admin Command Center Features
         // Audio Engine
         speakText,
         stopSpeech,

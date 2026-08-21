@@ -282,20 +282,20 @@ export const translateClinicalText = async (text, sourceLang = 'en', targetLang 
     }
   }
 
-  // 3. Smart Semantic Translation via free public translation API
+  // 3. Smart Semantic Translation via our internal Gemini API
   try {
     const sourceCode = sourceLang === 'ml' ? 'ml' : sourceLang === 'bn' ? 'bn' : sourceLang === 'hi' ? 'hi' : 'en';
     const targetCode = targetLang === 'ml' ? 'ml' : targetLang === 'bn' ? 'bn' : targetLang === 'hi' ? 'hi' : 'en';
     
     if (sourceCode !== targetCode) {
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(clean)}&langpair=${sourceCode}|${targetCode}`;
-      const response = await fetch(url, { signal: AbortSignal.timeout(2000) });
-      if (response.ok) {
-        const data = await response.json();
-        const translated = data?.responseData?.translatedText;
-        if (translated && !translated.includes('MYMEMORY WARNING') && translated.toLowerCase() !== clean.toLowerCase()) {
-          return translated;
-        }
+      const res = await fetch('http://localhost:5000/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: clean, targetLangCode: targetCode })
+      });
+      const data = await res.json();
+      if (data.success && data.translatedText) {
+        return data.translatedText;
       }
     }
   } catch (err) {
@@ -318,7 +318,7 @@ export const translateClinicalText = async (text, sourceLang = 'en', targetLang 
     if (lower.includes('allergy')) {
       return "क्या आपको किसी दवा या इंजेक्शन से कोई एलर्जी है?";
     }
-    return `डॉक्टर का संदेश: ${clean}`;
+    return clean;
   }
 
   if (targetLang === 'bn') {
@@ -334,7 +334,7 @@ export const translateClinicalText = async (text, sourceLang = 'en', targetLang 
     if (lower.includes('allergy')) {
       return "আপনার কি কোনো ওষুধ বা ইঞ্জেকশনে কোনো অ্যালার্জি আছে?";
     }
-    return `ডাক্তারের নির্দেশ: ${clean}`;
+    return clean;
   }
 
   if (targetLang === 'ml') {
@@ -344,7 +344,7 @@ export const translateClinicalText = async (text, sourceLang = 'en', targetLang 
     if (lower.includes('fever')) {
       return "എത്ര ദിവസമായി പനിയും ശരീരവേദനയുമുണ്ട്?";
     }
-    return `രോഗിയുടെ വിവരം: ${clean}`;
+    return clean;
   }
 
   return clean;

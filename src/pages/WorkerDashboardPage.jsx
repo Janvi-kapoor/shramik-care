@@ -1,17 +1,14 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { WorkerDashboardHeader } from '../components/dashboard/WorkerDashboardHeader';
 import { DesktopSidebar } from '../components/dashboard/DesktopSidebar';
 import { BottomNavBar } from '../components/dashboard/BottomNavBar';
-import { TabHealthPassport } from '../components/dashboard/TabHealthPassport';
-import { TabAiScanner } from '../components/dashboard/TabAiScanner';
-import { TabVoicePillClock } from '../components/dashboard/TabVoicePillClock';
-import { TabWelfareWallet } from '../components/dashboard/TabWelfareWallet';
 import { HospitalModal } from '../components/dashboard/HospitalModal';
 import { JanAushadhiModal } from '../components/dashboard/JanAushadhiModal';
 
 export const WorkerDashboardPage = ({ onReturnHome }) => {
-  const { activeDashboardTab, activeSession } = useApp();
+  const { activeSession } = useApp();
 
   if (!activeSession || activeSession.role !== 'worker') return null;
 
@@ -27,10 +24,7 @@ export const WorkerDashboardPage = ({ onReturnHome }) => {
 
         {/* Content Container (Full Width / Max-W-6xl on Desktop) */}
         <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
-          {activeDashboardTab === 'passport' && <TabHealthPassport />}
-          {activeDashboardTab === 'scanner' && <TabAiScanner />}
-          {activeDashboardTab === 'pills' && <TabVoicePillClock />}
-          {activeDashboardTab === 'wallet' && <TabWelfareWallet />}
+          <Outlet />
         </main>
       </div>
 
