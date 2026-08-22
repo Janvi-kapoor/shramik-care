@@ -1,32 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
+import QRCode from 'qrcode';
 
 export const WorkerHealthCard = ({ worker, isModalView = false, onProceed }) => {
   const { t, showToast } = useApp();
 
   if (!worker) return null;
 
-  // Generate SVG QR Matrix Pattern based on worker ID string
-  const generateQrCells = () => {
-    const seed = (worker.id + worker.abhaId).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const cells = [];
-    const size = 11;
-    for (let r = 0; r < size; r++) {
-      for (let c = 0; c < size; c++) {
-        // Static corners
-        const isCorner = (r < 3 && c < 3) || (r < 3 && c >= size - 3) || (r >= size - 3 && c < 3);
-        const isPattern = ((r * size + c + seed) * 17) % 3 === 0;
-        cells.push({ r, c, active: isCorner || isPattern });
-      }
-    }
-    return { cells, size };
-  };
-
-  const { cells, size } = generateQrCells();
+  const [qrUrl, setQrUrl] = useState('');
+  useEffect(() => {
+    QRCode.toDataURL(worker.qrCodeData || `SHRAMIKCARE://${worker.id}`, { margin: 1, width: 220 }).then(setQrUrl).catch(() => setQrUrl(''));
+  }, [worker]);
 
   return (
     <div className="w-full rounded-3xl overflow-hidden shadow-sm border border-slate-200 bg-[#f7f8ff] relative flex flex-col h-full min-h-[220px]">
-      
+
       {/* Background Gradient/Polygon Mock */}
       <div className="absolute top-0 right-0 w-64 h-full pointer-events-none opacity-50">
          <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-blue-400 via-indigo-300 to-transparent" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0% 100%, 30% 0)' }}></div>
@@ -34,10 +22,10 @@ export const WorkerHealthCard = ({ worker, isModalView = false, onProceed }) => 
       </div>
 
       <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col sm:flex-row justify-between">
-        
+
         {/* Left Side Info */}
         <div className="flex flex-col justify-between">
-          
+
           <div className="flex items-center space-x-3 mb-8">
             <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
               <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -97,18 +85,7 @@ export const WorkerHealthCard = ({ worker, isModalView = false, onProceed }) => 
         {/* Right Side QR Code */}
         <div className="mt-6 sm:mt-0 flex flex-col items-end justify-center">
             <div className="w-28 h-28 sm:w-[136px] sm:h-[136px] bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200/60 flex items-center justify-center relative">
-              <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full text-[#1e293b]">
-                {cells.map((cell, idx) => (
-                  <rect
-                    key={idx}
-                    x={cell.c}
-                    y={cell.r}
-                    width="1"
-                    height="1"
-                    fill={cell.active ? '#1e293b' : '#FFFFFF'}
-                  />
-                ))}
-              </svg>
+              {qrUrl && <img src={qrUrl} alt="Worker Health ID QR code" className="w-full h-full" />}
             </div>
         </div>
       </div>

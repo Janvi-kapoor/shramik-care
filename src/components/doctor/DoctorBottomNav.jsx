@@ -1,24 +1,24 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { 
-  LayoutDashboard, 
-  QrCode, 
-  Languages, 
-  ClipboardList 
+import {
+  LayoutDashboard,
+  QrCode,
+  Languages,
+  ClipboardList
 } from 'lucide-react';
 
 export const DoctorBottomNav = () => {
 
   const tabs = [
     {
-      id: 'analytics',
-      label: 'Overview',
+      id: 'dashboard',
+      label: 'Dashboard',
       icon: LayoutDashboard,
     },
     {
       id: 'scanner',
-      label: 'Patient QR',
+      label: 'Scan Worker',
       icon: QrCode,
     },
     {
@@ -29,7 +29,7 @@ export const DoctorBottomNav = () => {
     },
     {
       id: 'records',
-      label: 'Registry',
+      label: 'Reports',
       icon: ClipboardList,
     },
   ];

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { 
-  Volume2, 
+import {
+  Volume2,
   ChevronDown,
   Navigation,
   PhoneCall,
@@ -13,12 +13,16 @@ import { EMPANELLED_HOSPITALS } from '../../data/mockDatabase';
 
 export const TabVoicePillClock = () => {
   const { activeSession, speakText, isAudioSpeaking, t, getSavedPrescriptionsForWorker } = useApp();
-  const [selectedLang, setSelectedLang] = useState('hi');
+  const [selectedLang, setSelectedLang] = useState(() => activeSession?.user?.audioLanguage || 'hi');
   const [hospitalFilter, setHospitalFilter] = useState('All');
-  
+
   const worker = activeSession?.user;
   const saved = getSavedPrescriptionsForWorker ? getSavedPrescriptionsForWorker(worker?.id) : [];
   const latestPrescription = saved.length > 0 ? saved[0] : null;
+
+  useEffect(() => {
+    if (worker?.audioLanguage) setSelectedLang(worker.audioLanguage);
+  }, [worker?.audioLanguage]);
 
   const handleListen = () => {
     let text = "";
@@ -54,7 +58,7 @@ export const TabVoicePillClock = () => {
 
   return (
     <div className="animate-in fade-in duration-200 grid grid-cols-1 xl:grid-cols-2 gap-6">
-      
+
       {/* Left: Voice Care */}
       <div className="space-y-6 flex flex-col">
          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex-1">
@@ -63,10 +67,10 @@ export const TabVoicePillClock = () => {
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{t('wpVoiceCare', 'Medicine Voice')}</h3>
                 <p className="text-sm text-slate-500">Listen to your medicine instructions.</p>
               </div>
-              
+
               <div className="relative">
-                <select 
-                  value={selectedLang} 
+                <select
+                  value={selectedLang}
                   onChange={(e) => setSelectedLang(e.target.value)}
                   className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-sm font-bold text-[#5a32fa] focus:outline-none focus:border-[#5a32fa]"
                 >
@@ -84,18 +88,18 @@ export const TabVoicePillClock = () => {
                  <h4 className="text-xs font-bold text-slate-500 uppercase">Current Prescription</h4>
                  <span className="text-xs font-semibold text-slate-900 bg-white px-2 py-1 rounded-md border border-slate-100 shadow-sm">
                    {latestPrescription ? (
-                     new Date(latestPrescription.date || latestPrescription.timestamp).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) !== 'Invalid Date' 
+                     new Date(latestPrescription.date || latestPrescription.timestamp).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) !== 'Invalid Date'
                        ? new Date(latestPrescription.date || latestPrescription.timestamp).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
                        : "Recent"
                    ) : "None"}
                  </span>
                </div>
-               
+
                <div className="mb-4 bg-white p-3 rounded-lg border border-slate-100">
                  <p className="text-[10px] text-slate-400 uppercase mb-1">Diagnosis</p>
                  <p className="text-sm font-bold text-slate-900">{latestPrescription?.diagnosis || "No diagnosis saved"}</p>
                </div>
-               
+
                <div>
                  <p className="text-[10px] text-slate-400 uppercase mb-2">Medicines</p>
                  <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
@@ -118,7 +122,7 @@ export const TabVoicePillClock = () => {
                </div>
             </div>
 
-            <button 
+            <button
               onClick={handleListen}
               disabled={isAudioSpeaking || (!latestPrescription || !latestPrescription.medicines?.length)}
               className="w-full py-3.5 px-4 bg-[#5a32fa] hover:bg-[#4825cc] text-white rounded-xl font-bold flex items-center justify-center space-x-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
@@ -145,15 +149,15 @@ export const TabVoicePillClock = () => {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col">
          <h3 className="text-lg font-bold text-slate-900 mb-1">{t('wpCareNearYou', 'Care Near You')}</h3>
          <p className="text-sm text-slate-500 mb-6">Nearby verified healthcare facilities</p>
-         
+
          <div className="flex space-x-2 mb-6 overflow-x-auto pb-2 custom-scrollbar">
             {['All', 'Hospitals', 'Clinics', 'Govt.'].map(filter => (
-              <button 
+              <button
                 key={filter}
                 onClick={() => setHospitalFilter(filter)}
                 className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${
-                  hospitalFilter === filter 
-                    ? 'bg-indigo-50 text-[#5a32fa] border border-indigo-100' 
+                  hospitalFilter === filter
+                    ? 'bg-indigo-50 text-[#5a32fa] border border-indigo-100'
                     : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
                 }`}
               >

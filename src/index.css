@@ -9,13 +9,76 @@
   }
 }
 
+/* Doctor and government portals share the landing page indigo visual language. */
+.doctor-portal .bg-teal-50,
+.doctor-portal .bg-teal-100,
+.doctor-portal .bg-teal-800,
+.doctor-portal .bg-teal-900,
+.doctor-portal .bg-emerald-50,
+.doctor-portal .bg-emerald-100,
+.doctor-portal .bg-emerald-400,
+.doctor-portal .bg-emerald-950,
+.government-portal .bg-teal-50,
+.government-portal .bg-teal-100,
+.government-portal .bg-teal-700,
+.government-portal .bg-teal-800,
+.government-portal .bg-teal-900,
+.government-portal .bg-emerald-50,
+.government-portal .bg-emerald-100,
+.government-portal .bg-emerald-400,
+.government-portal .bg-emerald-950 {
+  background-color: #f0efff !important;
+}
+
+.doctor-portal .bg-teal-800,
+.doctor-portal .bg-teal-900,
+.government-portal .bg-teal-700,
+.government-portal .bg-teal-800,
+.government-portal .bg-teal-900 {
+  background-color: #5a52d9 !important;
+  color: white !important;
+}
+
+.doctor-portal .text-teal-700,
+.doctor-portal .text-teal-800,
+.doctor-portal .text-teal-900,
+.doctor-portal .text-emerald-700,
+.doctor-portal .text-emerald-800,
+.government-portal .text-teal-600,
+.government-portal .text-teal-700,
+.government-portal .text-teal-800,
+.government-portal .text-teal-900,
+.government-portal .text-emerald-600,
+.government-portal .text-emerald-700,
+.government-portal .text-emerald-800 {
+  color: #5a52d9 !important;
+}
+
+.doctor-portal .border-teal-200,
+.doctor-portal .border-teal-300,
+.doctor-portal .border-teal-400,
+.doctor-portal .border-teal-500,
+.doctor-portal .border-emerald-200,
+.doctor-portal .border-emerald-300,
+.government-portal .border-teal-100,
+.government-portal .border-teal-200,
+.government-portal .border-teal-300,
+.government-portal .border-emerald-200,
+.government-portal .border-emerald-300 {
+  border-color: #c9c5ff !important;
+}
+
 /* Custom Kerala Backwater Pattern Generator / Decorative Utilities */
 .kerala-mesh-gradient {
-  background: radial-gradient(circle at 10% 20%, rgba(13, 92, 82, 0.95) 0%, rgba(6, 78, 59, 1) 90%);
+  background: radial-gradient(
+    circle at 10% 20%,
+    rgba(13, 92, 82, 0.95) 0%,
+    rgba(6, 78, 59, 1) 90%
+  );
 }
 
 .kerala-gold-gradient {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 .kerala-glass-card {
@@ -39,14 +102,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }

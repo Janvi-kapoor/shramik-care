@@ -67,15 +67,15 @@ const ToastNotification = () => {
 // Protected Route Component
 const ProtectedRoute = ({ allowedRole }) => {
   const { activeSession } = useApp();
-  
+
   if (!activeSession) {
     return <Navigate to="/" replace />;
   }
-  
+
   if (allowedRole && activeSession.role !== allowedRole) {
     return <Navigate to="/" replace />;
   }
-  
+
   return <Outlet />;
 };
 
@@ -115,39 +115,30 @@ const MainContent = () => {
         {/* DOCTOR ROUTES */}
         <Route element={<ProtectedRoute allowedRole="doctor" />}>
           <Route path="/doctor" element={
-            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
-              <AppHeader />
-              <main className="flex-1 pb-20">
-                <DoctorWorkstationPage />
-              </main>
-            </div>
+            <DoctorWorkstationPage />
           }>
             <Route index element={<Navigate to="scanner" replace />} />
+            <Route path="dashboard" element={<DoctorOverviewView />} />
             <Route path="scanner" element={<DoctorQRScannerView />} />
             <Route path="patients" element={<DoctorPatientLookup />} />
-            <Route path="consult" element={<DoctorPatientLookup />} /> {/* Shared view for now */}
+            <Route path="consult" element={<DoctorPatientLookup />} />
+            <Route path="analytics" element={<DoctorOverviewView />} />
+            <Route path="records" element={<DoctorPatientLookup />} />
             <Route path="translator" element={<DoctorVoiceTranslator />} />
           </Route>
         </Route>
 
         {/* ADMIN ROUTES */}
         <Route element={<ProtectedRoute allowedRole="admin" />}>
-          <Route path="/admin" element={
-            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
-              <AppHeader />
-              <main className="flex-1 pb-20">
-                <AdminDashboardPage />
-              </main>
-            </div>
-          }>
+          <Route path="/admin" element={<AdminDashboardPage />}>
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<AdminHeatmapView />} />
-            <Route path="outbreaks" element={<AdminHeatmapView />} />
+            <Route path="advisories" element={<AdminAlertBroadcastView />} />
             <Route path="camps" element={<AdminCampDispatcherView />} />
-            <Route path="claims" element={<AdminInsuranceClaimsView />} />
+            <Route path="operations" element={<AdminCampDispatcherView />} />
           </Route>
         </Route>
-        
+
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

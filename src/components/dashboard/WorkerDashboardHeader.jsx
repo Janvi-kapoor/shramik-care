@@ -36,7 +36,7 @@ export const WorkerDashboardHeader = ({ onReturnHome }) => {
       {/* Main Navbar */}
       <nav className="w-full px-4 sm:px-8 py-3 bg-white">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-           
+
           {/* Logo - Exact Same as Landing Page */}
           <div className="flex items-center space-x-3 group cursor-pointer" onClick={onReturnHome}>
              <div className="relative w-11 h-11 flex items-center justify-center transition-transform group-hover:scale-105">
@@ -67,11 +67,11 @@ export const WorkerDashboardHeader = ({ onReturnHome }) => {
               <div className="flex items-center space-x-1.5 text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-1">
                 <span className="font-malayalam text-[#635dc9]">മലയാളം</span>
                 <span className="text-slate-300">•</span>
-                <span>Worker Portal</span>
+                <span>{activeSession.role === 'doctor' ? 'Doctor Portal' : 'Worker Portal'}</span>
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
                {/* Worker Profile Mini */}
                <div className="hidden md:flex items-center space-x-3 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200 shadow-sm mr-2">
@@ -86,7 +86,7 @@ export const WorkerDashboardHeader = ({ onReturnHome }) => {
 
                {/* Language Dropdown */}
              <div className="relative">
-              <button 
+              <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
                 className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 transition-colors shadow-sm"
               >
@@ -94,7 +94,7 @@ export const WorkerDashboardHeader = ({ onReturnHome }) => {
                 <span className="text-sm font-bold text-slate-700">{activeLang.label}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
               </button>
-              
+
               {isLangOpen && (
                 <div className="absolute top-full mt-2 right-0 w-40 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden py-1 z-[100]">
                   {LANGUAGES.map(lang => (
@@ -114,7 +114,7 @@ export const WorkerDashboardHeader = ({ onReturnHome }) => {
               )}
             </div>
 
-            <button 
+            <button
               onClick={logout}
               className="flex items-center space-x-2 bg-rose-50 hover:bg-rose-100 text-rose-700 px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition-colors border border-rose-200"
             >

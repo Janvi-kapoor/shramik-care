@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useNavigate } from 'react-router-dom';
 import { MOCK_PRESCRIPTION_SCANS } from '../data/mockDatabase';
 import { TRANSLATIONS } from '../data/translations';
-import { fallbackTranslations } from '../utils/clinicalAudioBackup';
+import { translateClinicalText } from '../utils/clinicalTranslator';
 
 const AppContext = createContext();
 
@@ -24,7 +24,7 @@ export const AppProvider = ({ children }) => {
         if (res.ok) {
           const data = await res.json();
           setWorkers(data);
-          
+
           if (data.length > 0) {
             setSelectedPatient(prev => prev || data[0]);
           }
@@ -62,7 +62,7 @@ export const AppProvider = ({ children }) => {
         .catch(err => console.error("Error fetching worker prescriptions:", err));
     }
   }, [activeSession]);
-  
+
   // Daily Pill Adherence Checklist State
   const [pillAdherence, setPillAdherence] = useState(() => {
     try {
@@ -156,7 +156,7 @@ export const AppProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         return { success: false, message: data.error || t('alertAuthFailed') };
       }
@@ -167,7 +167,7 @@ export const AppProvider = ({ children }) => {
         token: data.token,
         loginTime: new Date().toISOString()
       };
-      
+
       setActiveSession(session);
       setIsAuthModalOpen(false);
       showToast(`${t('alertLoginSuccess')} ${data.user.name}`, 'success');
@@ -179,7 +179,7 @@ export const AppProvider = ({ children }) => {
       } else if (role === 'admin') {
         navigate('/admin/overview');
       }
-      
+
       return { success: true, user: data.user };
     } catch (err) {
       console.error('Login error:', err);
@@ -309,98 +309,58 @@ export const AppProvider = ({ children }) => {
   // Flawless Multilingual Speech Engine (Bengali, Malayalam, Hindi, English)
   const speakText = async (text, slotId = null, forcedLang = null, skipTranslation = false) => {
     if (!text || text.trim() === '') return;
-    
-    setIsAudioSpeaking(true);
-    setCurrentlyPlayingSlot(slotId || 'all');
-
-    const langCodeMap = {
-      hi: 'hi',
-      bn: 'bn',
-      ml: 'ml',
-      or: 'or',
-      en: 'en'
-    };
-    
-    let baseLang = (forcedLang || currentLanguage).split('-')[0];
-    const targetLangCode = langCodeMap[baseLang] || 'en';
-
-    let textToSpeak = text;
-    
+    const targetLangCode = (forcedLang || currentLanguage).split('-')[0];
+    let textToSpeak = text.trim();
     if (!skipTranslation && targetLangCode !== 'en') {
-      const cleanText = text.trim();
-      if (fallbackTranslations[cleanText] && fallbackTranslations[cleanText][targetLangCode+'-IN']) {
-        textToSpeak = fallbackTranslations[cleanText][targetLangCode+'-IN'];
-      } else {
-        try {
-          const res = await fetch('http://localhost:5000/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, targetLangCode })
-          });
-          const data = await res.json();
-          if (data.success && data.translatedText) {
-            textToSpeak = data.translatedText;
-          }
-        } catch (err) {
-          console.warn('Failed to translate text:', err);
-        }
+      try {
+        const translationResponse = await fetch('http://localhost:5000/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: textToSpeak, targetLangCode })
+        });
+        if (!translationResponse.ok) throw new Error(`Translation API returned ${translationResponse.status}`);
+        const translationData = await translationResponse.json();
+        if (translationData.translatedText) textToSpeak = translationData.translatedText;
+      } catch (error) {
+        console.warn('Worker speech translation unavailable:', error);
+        textToSpeak = await translateClinicalText(textToSpeak, 'en', targetLangCode);
       }
     }
-
-    try {
-      // Chunking for translate_tts (max 200 chars per request)
-      const words = textToSpeak.split(' ');
-      let chunks = [];
-      let currentChunk = '';
-      for (const word of words) {
-        if ((currentChunk + ' ' + word).length > 150) {
-          chunks.push(currentChunk);
-          currentChunk = word;
-        } else {
-          currentChunk = currentChunk ? currentChunk + ' ' + word : word;
-        }
-      }
-      if (currentChunk) chunks.push(currentChunk);
-
-      const playNext = (index) => {
-        if (index >= chunks.length) {
-          setIsAudioSpeaking(false);
-          setCurrentlyPlayingSlot(null);
+    if (typeof window !== 'undefined') {
+      try {
+        const response = await fetch('http://localhost:5000/api/translate/speech', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: textToSpeak, language: targetLangCode })
+        });
+        if (response.ok) {
+          const audio = new Audio(URL.createObjectURL(await response.blob()));
+          window.__currentAudio = audio;
+          audio.onplay = () => { setIsAudioSpeaking(true); setCurrentlyPlayingSlot(slotId || 'all'); };
+          audio.onended = () => { setIsAudioSpeaking(false); setCurrentlyPlayingSlot(null); URL.revokeObjectURL(audio.src); };
+          audio.onerror = () => { setIsAudioSpeaking(false); setCurrentlyPlayingSlot(null); showToast('AI audio could not be played.', 'error'); };
+          await audio.play();
           return;
         }
-        
-        const url = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(chunks[index]) + '&tl=' + targetLangCode + '&client=tw-ob';
-        const audio = new Audio(url);
-        
-        // Expose global so we can stop it
-        window.__currentAudio = audio;
-        
-        audio.onended = () => playNext(index + 1);
-        audio.onerror = () => {
-          console.warn('Failed to play chunk.');
-          setIsAudioSpeaking(false);
-          setCurrentlyPlayingSlot(null);
-        };
-        audio.play().catch(e => {
-          console.warn('Audio play blocked:', e);
-          setIsAudioSpeaking(false);
-          setCurrentlyPlayingSlot(null);
-        });
-      };
-      
-      if (window.__currentAudio) {
-        window.__currentAudio.pause();
+        if (response.status === 503) showToast('AI voice is not configured. Add GEMINI_API_KEY to server/.env.', 'error');
+      } catch (error) {
+        console.warn('AI speech unavailable, using browser voice:', error);
       }
-      playNext(0);
-      
-    } catch (e) {
-      console.error(e);
-      setIsAudioSpeaking(false);
-      setCurrentlyPlayingSlot(null);
     }
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      showToast('AI speech is unavailable and this browser has no speech voice.', 'error');
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = targetLangCode === 'ml' ? 'ml-IN' : targetLangCode === 'bn' ? 'bn-IN' : targetLangCode === 'hi' ? 'hi-IN' : 'en-IN';
+    const matchingVoice = window.speechSynthesis.getVoices().find(voice => voice.lang.toLowerCase().startsWith(targetLangCode));
+    if (matchingVoice) utterance.voice = matchingVoice;
+    utterance.onstart = () => { setIsAudioSpeaking(true); setCurrentlyPlayingSlot(slotId || 'all'); };
+    utterance.onend = () => { setIsAudioSpeaking(false); setCurrentlyPlayingSlot(null); };
+    utterance.onerror = () => { setIsAudioSpeaking(false); setCurrentlyPlayingSlot(null); showToast(`No ${targetLangCode.toUpperCase()} speech voice is available in this browser.`, 'error'); };
+    window.speechSynthesis.speak(utterance);
   };
 
-  const stopSpeech = () => { if (window.__currentAudio) { window.__currentAudio.pause(); window.__currentAudio = null; } 
+  const stopSpeech = () => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       setIsAudioSpeaking(false);
@@ -424,7 +384,7 @@ export const AppProvider = ({ children }) => {
         body: JSON.stringify(newRecord)
       });
       if (!res.ok) throw new Error("Failed to save to backend");
-      
+
       const data = await res.json();
       const finalRecord = { id: data.prescriptionId || `PRES-${Date.now()}`, workerId, ...newRecord };
       setSavedPrescriptions(prev => [finalRecord, ...prev]);
@@ -446,6 +406,30 @@ export const AppProvider = ({ children }) => {
 
   const getSavedPrescriptionsForWorker = (workerId) => {
     return savedPrescriptions.filter(p => p.workerId === workerId);
+  };
+
+  const doctorApi = async (path, options = {}) => {
+    const response = await fetch(`http://localhost:5000/api/doctor${path}`, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${activeSession?.token || ''}`, ...(options.headers || {}) }
+    });
+    const body = await response.text();
+    let data;
+    try { data = JSON.parse(body); } catch { throw new Error('Backend API returned an invalid response. Please start the ShramikCare server.'); }
+    if (!response.ok) throw new Error(data.error || 'Doctor API request failed');
+    return data;
+  };
+
+  const adminApi = async (path, options = {}) => {
+    const response = await fetch(`http://localhost:5000/api/admin${path}`, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${activeSession?.token || ''}`, ...(options.headers || {}) }
+    });
+    const body = await response.text();
+    let data;
+    try { data = JSON.parse(body); } catch { throw new Error('Backend API returned an invalid response. Please start the ShramikCare server.'); }
+    if (!response.ok) throw new Error(data.error || 'Government API request failed');
+    return data;
   };
 
   return (
@@ -488,6 +472,8 @@ export const AppProvider = ({ children }) => {
         saveWorkerPrescription,
         getMedicinesForWorker,
         getSavedPrescriptionsForWorker
+        ,doctorApi
+        ,adminApi
       }}
     >
       {children}

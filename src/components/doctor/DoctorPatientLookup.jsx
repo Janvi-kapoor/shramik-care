@@ -1,36 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Phone, 
-  Languages, 
-  Stethoscope, 
-  Activity, 
-  CheckCircle2, 
+import {
+  Phone,
+  Languages,
+  Stethoscope,
+  Activity,
+  CheckCircle2,
   AlertCircle,
   FileText
 } from 'lucide-react';
 
 export const DoctorPatientLookup = () => {
-  const { selectedPatient, t } = useApp();
+  const { selectedPatient, setSelectedPatient, doctorApi, showToast } = useApp();
   const navigate = useNavigate();
   const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [matches, setMatches] = useState([]);
+  const [report, setReport] = useState(null);
+  const [summary, setSummary] = useState('');
+  const [consultation, setConsultation] = useState({ diagnosis: '', notes: '', publicHealthCondition: '' });
 
   useEffect(() => {
     if (selectedPatient?.id) {
       setLoading(true);
-      fetch(`http://localhost:5000/api/workers/${selectedPatient.id}/prescriptions`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            setPrescriptions(data);
-          }
-        })
-        .catch(err => console.error("Error fetching prescriptions:", err))
+      doctorApi(`/patients/${selectedPatient.id}/report`)
+                .then(data => {
+                  setReport(data);
+                  setSelectedPatient(data.worker);
+                  setPrescriptions(data.prescriptions || []);
+                  return data;
+                })
+        .then(() => doctorApi(`/patients/${selectedPatient.id}/summary`))
+        .then(data => setSummary(data.summary))
+        .catch(err => showToast(err.message, 'error'))
         .finally(() => setLoading(false));
     }
-  }, [selectedPatient]);
+  }, [selectedPatient?.id]);
 
   if (!selectedPatient) {
     return (
@@ -62,6 +69,13 @@ export const DoctorPatientLookup = () => {
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6 animate-in fade-in duration-200">
+      {report && !loading && (
+        <div className="p-4 rounded-xl bg-teal-50 border border-teal-200">
+          <div className="flex items-center gap-2 mb-1"><Stethoscope className="w-4 h-4 text-teal-800" /><h4 className="text-xs font-black uppercase tracking-wider text-teal-900">AI-assisted record summary</h4></div>
+          <p className="text-sm text-teal-950">{summary || 'No summary available.'}</p>
+          <p className="text-[10px] text-teal-800 mt-1">Informational summary of stored records, not a diagnosis.</p>
+        </div>
+      )}
       {hasAllergy && (
         <div className="p-4 rounded-lg bg-rose-50 border-2 border-rose-500 flex items-center space-x-3 animate-pulse">
           <AlertCircle className="w-6 h-6 text-rose-600" />
@@ -196,22 +210,13 @@ export const DoctorPatientLookup = () => {
                 </div>
               </div>
             ))}
-            
-            {/* Keeping the base history so it's not totally empty if they have no prescriptions */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start space-x-3.5">
-              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-800 mt-0.5 flex-shrink-0">
-                <CheckCircle2 className="w-4 h-4" />
+
+            {report?.consultations?.map((consultation) => (
+              <div key={consultation.id} className="p-4 rounded-xl bg-teal-50 border border-teal-200 flex items-start space-x-3.5">
+                <div className="p-2 rounded-lg bg-teal-100 text-teal-800 mt-0.5 flex-shrink-0"><CheckCircle2 className="w-4 h-4" /></div>
+                <div className="flex-1"><div className="flex items-center justify-between"><span className="font-bold text-slate-900 text-sm">Consultation: {consultation.diagnosis || 'General consultation'}</span><span className="text-slate-400 font-mono text-[10px]">{new Date(consultation.date).toLocaleDateString()}</span></div>{consultation.notes && <p className="text-slate-600 mt-1 leading-relaxed">{consultation.notes}</p>}</div>
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-sm">Perumbavoor Hub Digital Enrollment</span>
-                  <span className="text-slate-400 font-mono text-[10px]">15 Nov 2024</span>
-                </div>
-                <p className="text-slate-600 mt-1 leading-relaxed">
-                  Primary biometric camp onboarding, 14-digit ABHA ID generated, AWAZ health card seeded with ₹50,000 cashless annual allocation.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         )}
       </div>

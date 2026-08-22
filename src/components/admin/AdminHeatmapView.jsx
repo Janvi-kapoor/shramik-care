@@ -3,7 +3,7 @@ import { Activity, AlertTriangle, Users, MapPin, CheckCircle2, ChevronRight, Fil
 import { useApp } from '../../context/AppContext';
 
 export const AdminHeatmapView = () => {
-  const { showToast } = useApp();
+  const { showToast, adminApi } = useApp();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [district, setDistrict] = useState('All Districts');
@@ -15,14 +15,11 @@ export const AdminHeatmapView = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/health-overview?district=${encodeURIComponent(district)}`);
-      const json = await res.json();
-      
-      const outRes = await fetch(`http://localhost:5000/api/admin/outbreak?district=${encodeURIComponent(district)}`);
-      const outJson = await outRes.json();
-      
+      const json = await adminApi(`/health-overview?district=${encodeURIComponent(district)}`);
+      const outJson = await adminApi(`/outbreak?district=${encodeURIComponent(district)}`);
+
       if (json.error) throw new Error(json.error);
-      
+
       // Merge outbreak data into clusters/alerts so UI doesn't break
       if (outJson.success) {
          json.clusters = outJson.allData.map(d => ({ district: d.district, condition: d.symptom, count: d.count }));
@@ -40,7 +37,7 @@ export const AdminHeatmapView = () => {
       setData(json);
     } catch (err) {
       console.error(err);
-      showToast('error', 'Failed to load health overview');
+      showToast('Failed to load health overview', 'error');
     } finally {
       setLoading(false);
     }
@@ -49,7 +46,7 @@ export const AdminHeatmapView = () => {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5a52d9]"></div>
       </div>
     );
   }
@@ -62,10 +59,10 @@ export const AdminHeatmapView = () => {
           <h2 className="text-xl font-bold text-slate-900">District Public Health Overview</h2>
           <p className="text-sm text-slate-500">Real-time aggregation of doctor consultations and health events</p>
         </div>
-        
+
         <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-lg p-1">
           <Filter className="w-4 h-4 text-slate-400 ml-2" />
-          <select 
+          <select
             className="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 cursor-pointer py-2 pl-2 pr-8"
             value={district}
             onChange={(e) => setDistrict(e.target.value)}
@@ -86,7 +83,7 @@ export const AdminHeatmapView = () => {
           </div>
           <span className="text-3xl font-black text-slate-900">{data?.metrics?.activeAlerts || 0}</span>
         </div>
-        
+
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-slate-500">Active Camps</span>
@@ -94,7 +91,7 @@ export const AdminHeatmapView = () => {
           </div>
           <span className="text-3xl font-black text-slate-900">{data?.metrics?.activeCamps || 0}</span>
         </div>
-        
+
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-slate-500">Registered Workers</span>
@@ -118,7 +115,7 @@ export const AdminHeatmapView = () => {
           <Activity className="w-5 h-5 mr-2 text-rose-600" />
           Automated Health Alerts
         </h3>
-        
+
         {data?.alerts?.length === 0 ? (
           <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 mr-3" />

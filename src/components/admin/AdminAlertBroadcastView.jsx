@@ -3,10 +3,11 @@ import { Megaphone, Send, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 export const AdminAlertBroadcastView = () => {
-  const { t, showToast } = useApp();
+  const { showToast, adminApi } = useApp();
   const [message, setMessage] = useState('');
   const [targetDistricts, setTargetDistricts] = useState('all');
   const [priority, setPriority] = useState('Important');
+  const [language, setLanguage] = useState('en');
 
   const [isBroadcasting, setIsBroadcasting] = useState(false);
 
@@ -14,23 +15,21 @@ export const AdminAlertBroadcastView = () => {
     if (!message.trim()) return;
     setIsBroadcasting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/admin/broadcast', {
+      const data = await adminApi('/broadcast', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: 'Emergency Advisory',
           message: message,
           target_district: targetDistricts,
           target_languages: ['hi', 'bn', 'ml'],
+          language,
           priority: priority
         })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
       showToast(`Alert broadcasted to ${data.recipientCount ?? 'multiple'} workers.`, 'success');
       setMessage('');
     } catch (e) {
-      showToast('Error broadcasting alert', 'error');
+      showToast(e.message || 'Error broadcasting alert', 'error');
     } finally {
       setIsBroadcasting(false);
     }
@@ -55,20 +54,26 @@ export const AdminAlertBroadcastView = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Target District(s)</label>
-              <select 
+              <select
                 value={targetDistricts}
                 onChange={(e) => setTargetDistricts(e.target.value)}
                 className="w-full p-3 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-amber-500"
               >
                 <option value="all">All Kerala Districts</option>
-                <option value="ernakulam">Ernakulam (High Priority)</option>
-                <option value="trivandrum">Thiruvananthapuram</option>
+                <option value="Ernakulam">Ernakulam (High Priority)</option>
+                <option value="Palakkad">Palakkad</option>
               </select>
             </div>
-            
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Language</label>
+              <select value={language} onChange={e => setLanguage(e.target.value)} className="w-full p-3 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-amber-500">
+                <option value="en">English</option><option value="hi">Hindi</option><option value="ml">Malayalam</option><option value="bn">Bengali</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Priority</label>
-              <select 
+              <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 className="w-full p-3 rounded-lg border border-slate-300 text-sm font-semibold focus:ring-1 focus:ring-amber-500"

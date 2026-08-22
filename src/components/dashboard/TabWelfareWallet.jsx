@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { 
-  ShieldCheck, 
+import {
+  ShieldCheck,
   ChevronRight,
   Pill,
   Navigation,
@@ -14,16 +14,39 @@ export const TabWelfareWallet = () => {
   const { activeSession, t, getSavedPrescriptionsForWorker } = useApp();
   const worker = activeSession?.user;
   const [showCardBack, setShowCardBack] = useState(false);
+  const [camps, setCamps] = useState([]);
+  const [enrolling, setEnrolling] = useState(null);
+
+  useEffect(() => {
+    if (!worker?.district) return;
+    fetch(`http://localhost:5000/api/camps/active?district=${encodeURIComponent(worker.district)}`)
+      .then(response => response.json()).then(data => setCamps(Array.isArray(data) ? data : [])).catch(() => setCamps([]));
+  }, [worker?.district]);
+
+  const enrollInCamp = async camp => {
+    setEnrolling(camp.id);
+    try {
+      const response = await fetch('http://localhost:5000/api/workers/enroll-camp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ workerId: worker.id, campId: camp.id }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setCamps(previous => previous.map(item => item.id === camp.id ? { ...item, enrolled: (item.enrolled || 0) + 1 } : item));
+    } catch (error) { console.error(error); } finally { setEnrolling(null); }
+  };
 
   const saved = getSavedPrescriptionsForWorker ? getSavedPrescriptionsForWorker(worker?.id) : [];
   const latestPrescription = saved.length > 0 ? saved[0] : null;
 
   return (
     <div className="animate-in fade-in duration-200 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
+      <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <h3 className="text-lg font-bold text-slate-900 mb-1">Health Camps Near You</h3>
+        <p className="text-sm text-slate-500 mb-4">Government-deployed camps available in {worker?.district || 'your district'}.</p>
+        {camps.length === 0 ? <p className="text-sm text-slate-500">No active camps are currently available.</p> : <div className="grid gap-3">{camps.map(camp => <div key={camp.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-indigo-50 border border-indigo-100"><div><h4 className="font-bold text-slate-900">{camp.name || camp.purpose}</h4><p className="text-xs text-slate-600">{camp.location} · {camp.date} · {camp.purpose}</p><p className="text-xs text-slate-500 mt-1">Capacity {camp.capacity} · Registration available through ShramikCare</p></div><button disabled={enrolling === camp.id || camp.enrolled >= camp.capacity} onClick={() => enrollInCamp(camp)} className="px-3 py-2 rounded-lg bg-[#5a32fa] text-white text-xs font-bold disabled:opacity-50">{enrolling === camp.id ? 'Registering...' : camp.enrolled >= camp.capacity ? 'Full' : 'Enroll Now'}</button></div>)}</div>}
+      </div>
+
       {/* LEFT COLUMN */}
       <div className="space-y-6">
-        
+
         {/* Ayushman / Govt Schemes */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
            <h3 className="text-lg font-bold text-slate-900 mb-1">AWAZ Health Insurance (Kerala)</h3>
@@ -64,7 +87,7 @@ export const TabWelfareWallet = () => {
              </div>
            </div>
 
-           <button 
+           <button
              onClick={() => setShowCardBack(!showCardBack)}
              className="text-sm font-bold text-[#5a32fa] hover:text-[#4825cc] transition-colors flex items-center justify-center w-full mt-2">
              {showCardBack ? 'View Card Front' : 'View Card Details'}
@@ -119,7 +142,7 @@ export const TabWelfareWallet = () => {
 
       {/* RIGHT COLUMN */}
       <div className="space-y-6">
-        
+
         {/* Supported Healthcare */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
            <h3 className="text-lg font-bold text-slate-900 mb-1">Supported Healthcare Near You</h3>

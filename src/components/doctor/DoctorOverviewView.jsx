@@ -1,13 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { 
-  Users, 
-  AlertTriangle, 
-  Pill, 
-  ShieldCheck, 
-  MapPin, 
-  Clock, 
-  Stethoscope, 
+import {
+  Users,
+  AlertTriangle,
+  Pill,
+  ShieldCheck,
+  MapPin,
+  Clock,
+  Stethoscope,
   ArrowRight,
   QrCode,
   Languages,
@@ -17,58 +18,44 @@ import {
 } from 'lucide-react';
 
 export const DoctorOverviewView = () => {
-  const { workers: appWorkers, activeSession, selectedPatient, setSelectedPatient, setActiveDoctorTab, t } = useApp();
+  const { activeSession, selectedPatient, setSelectedPatient, doctorApi } = useApp();
   const doctor = activeSession?.user;
-  
-  const [activeCamp, setActiveCamp] = React.useState(null);
-  const [campWorkers, setCampWorkers] = React.useState([]);
+  const navigate = useNavigate();
+
+  const [dashboard, setDashboard] = React.useState({ patientsSeenToday: 0, consultationsToday: 0, recentPatients: [], upcomingCamps: [] });
 
   React.useEffect(() => {
-    if (doctor?.id) {
-      fetch(`http://localhost:5000/api/camps/doctor/${doctor.id}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.length > 0) {
-            setActiveCamp(data[0]); // Active camp
-            return fetch(`http://localhost:5000/api/camps/${data[0].id}/workers`);
-          }
-        })
-        .then(res => res ? res.json() : [])
-        .then(data => {
-          if (data && !data.error) setCampWorkers(data);
-        })
-        .catch(console.error);
-    }
+    if (doctor?.id) doctorApi('/dashboard').then(setDashboard).catch(console.error);
   }, [doctor?.id]);
 
-  const workers = activeCamp ? campWorkers : appWorkers;
+  const workers = dashboard.recentPatients;
 
   const stats = [
     {
       label: "Patients Triaged Today",
-      value: workers.length.toString(),
-      subtext: "On-site camp screening",
+      value: dashboard.patientsSeenToday.toString(),
+      subtext: "Distinct workers with consultations",
       icon: Users,
       color: "text-teal-900 bg-teal-50 border-teal-200"
     },
     {
       label: "Critical Allergies Flagged",
-      value: workers.filter(w => w.allergies && !w.allergies.includes('No Known Drug Allergies (NKDA)')).length.toString(),
-      subtext: "Penicillin & Sulfa alerts",
+      value: dashboard.consultationsToday.toString(),
+      subtext: "Consultations recorded today",
       icon: AlertTriangle,
       color: "text-rose-900 bg-rose-50 border-rose-200"
     },
     {
       label: "Prescriptions Dispatched",
-      value: "0",
-      subtext: "Jan Aushadhi generic linked",
+      value: "--",
+      subtext: "Prescription records",
       icon: Pill,
       color: "text-amber-900 bg-amber-50 border-amber-200"
     },
     {
       label: "AWAZ Cashless Coverage",
-      value: "100%",
-      subtext: "Zero out-of-pocket claims",
+      value: dashboard.upcomingCamps.length.toString(),
+      subtext: "Assigned active camps",
       icon: ShieldCheck,
       color: "text-emerald-900 bg-emerald-50 border-emerald-200"
     }
@@ -76,29 +63,29 @@ export const DoctorOverviewView = () => {
 
   const handleSelectAndGo = (worker) => {
     setSelectedPatient(worker);
-    setActiveDoctorTab('patient-lookup');
+    navigate('/doctor/consult');
   };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Active Camp Header Card */}
-      <div className="bg-gradient-to-r from-[#042F2E] via-[#0D5C52] to-[#064E3B] text-white rounded-xl p-5 md:p-6 shadow-sm border border-teal-600/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#3934b1] via-[#5a52d9] to-[#8c85fa] text-white rounded-xl p-5 md:p-6 shadow-sm border border-indigo-300 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded bg-emerald-400/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1.5 border border-emerald-400/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Live Health Camp Active</span>
+          <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded bg-white/15 text-indigo-100 text-[10px] font-black uppercase tracking-wider mb-1.5 border border-white/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"></span>
+            <span>Assigned Health Camp</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-white">
-            {activeCamp ? activeCamp.name : 'No Active Camps Assigned'}
+            {dashboard.upcomingCamps[0]?.location || 'No Active Camps Assigned'}
           </h2>
-          <span className="text-xs text-teal-100 block mt-1">
-            Nodal Hospital: {doctor?.facility} • Location: {activeCamp ? activeCamp.district : 'N/A'}
+          <span className="text-xs text-indigo-100 block mt-1">
+            Nodal Hospital: {doctor?.facility} • Location: {dashboard.upcomingCamps[0]?.district || 'N/A'}
           </span>
         </div>
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => setActiveDoctorTab('patient-lookup')}
+            onClick={() => navigate('/doctor/scanner')}
             className="px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-sm transition-colors flex items-center space-x-1.5"
           >
             <QrCode className="w-4 h-4" />
@@ -207,7 +194,7 @@ export const DoctorOverviewView = () => {
               Instantly speak in English/Malayalam and let the system speak Hindi or Bengali to the guest worker.
             </p>
             <button
-              onClick={() => setActiveDoctorTab('voice-translator')}
+              onClick={() => navigate('/doctor/translator')}
               className="w-full py-2.5 px-4 rounded-lg bg-teal-800 hover:bg-teal-900 text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center space-x-1.5"
             >
               <Languages className="w-4 h-4" />
@@ -227,7 +214,7 @@ export const DoctorOverviewView = () => {
               Export government-compliant camp clinical records, vitals, and AWAZ claim settlement documentation.
             </p>
             <button
-              onClick={() => setActiveDoctorTab('camp-registry')}
+              onClick={() => navigate('/doctor/patients')}
               className="w-full py-2.5 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center space-x-1.5"
             >
               <ClipboardList className="w-4 h-4" />

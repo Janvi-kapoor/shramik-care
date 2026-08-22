@@ -5,11 +5,13 @@ import jsQR from 'jsqr';
 import { QrCode, Search, Camera, X, Zap } from 'lucide-react';
 
 export const DoctorQRScannerView = () => {
-  const { workers, selectedPatient, setSelectedPatient, showToast } = useApp();
+  const { selectedPatient, setSelectedPatient, showToast, doctorApi } = useApp();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
-  
+  const [matches, setMatches] = useState([]);
+  const [cameraError, setCameraError] = useState('');
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -21,7 +23,7 @@ export const DoctorQRScannerView = () => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
       gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
       osc.connect(gain);
@@ -60,16 +62,9 @@ export const DoctorQRScannerView = () => {
 
       if (code && code.data) {
         const raw = code.data.trim();
-        const matched = workers.find(
-          (w) =>
-            raw.includes(w.id) ||
-            raw.includes(w.mobile) ||
-            raw.toLowerCase().includes(w.name.toLowerCase()) ||
-            raw.includes(w.abhaId)
-        );
-
-        if (matched) {
-          handlePatientFound(matched);
+        const workerId = raw.match(/SHRAMIKCARE:\/\/([^/]+)/i)?.[1] || raw.match(/KL-MIG-\d+/i)?.[0];
+        if (workerId) {
+          doctorApi(`/patients/${workerId}/report`).then(report => handlePatientFound(report.worker)).catch(() => showToast('Worker Health ID was not found.', 'error'));
           return;
         }
       }
@@ -89,11 +84,12 @@ export const DoctorQRScannerView = () => {
         videoRef.current.setAttribute('playsinline', 'true');
         videoRef.current.play();
         setIsCameraActive(true);
+          setCameraError('');
         animationFrameRef.current = requestAnimationFrame(scanQrFrame);
       }
     } catch (err) {
       console.warn('Camera access unavailable:', err);
-      showToast('Camera feed unavailable. Use quick phone screen scan buttons below.', 'info');
+      setCameraError(err.name === 'NotAllowedError' ? 'Camera permission was denied. Allow camera access and try again.' : 'Camera is unavailable on this device.');
       setIsCameraActive(false);
     }
   };
@@ -122,10 +118,10 @@ export const DoctorQRScannerView = () => {
         <div>
           <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 text-xs font-bold uppercase tracking-wider mb-1">
             <QrCode className="w-3.5 h-3.5" />
-            <span>Real-Time Optical Camera QR Scanner</span>
+            <span>Live Health ID Scanner</span>
           </div>
           <h2 className="text-base sm:text-lg font-bold text-slate-900">
-            Scan Worker Digital Health Pass
+            Scan Worker Health ID
           </h2>
         </div>
 
@@ -166,23 +162,29 @@ export const DoctorQRScannerView = () => {
         </div>
       )}
 
+      {cameraError && <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">{cameraError}</div>}
+
       <div className="relative">
         <input
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search patient by Name, KL-MIG ID, or Mobile number..."
+          onChange={async (e) => {
+            const value = e.target.value;
+            setSearchQuery(value);
+            if (value.trim()) {
+              try { setMatches(await doctorApi(`/patients?search=${encodeURIComponent(value)}`)); } catch { setMatches([]); }
+            } else setMatches([]);
+          }}
+          placeholder="Search by worker name or Health ID..."
           className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-600 bg-slate-50/50"
         />
         <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
       </div>
 
       <div>
-        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-          ⚡ Direct Phone Screen QR Simulation (1-Click Instant Triage):
-        </span>
+        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Search results from authorized records</span>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {workers.map((w) => {
+          {matches.map((w) => {
             const isSelected = selectedPatient?.id === w.id;
             const hasAllergy = w.allergies && !w.allergies.includes('No Known Drug Allergies (NKDA)');
             return (

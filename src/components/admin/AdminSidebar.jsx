@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { 
-  MapPin, 
-  Bus, 
-  Megaphone, 
-  ShieldCheck,
+import {
+  Activity,
+  Megaphone,
+  Bus,
+  ClipboardList,
   ChevronRight
 } from 'lucide-react';
 
@@ -13,39 +13,40 @@ export const AdminSidebar = () => {
 
   const navItems = [
     {
-      id: 'heatmap',
-      label: 'Disease Outbreak Heatmap',
-      icon: <MapPin className="w-5 h-5" />
+      id: 'overview',
+      label: 'Public Health Dashboard',
+      icon: <Activity className="w-5 h-5" />
     },
     {
-      id: 'dispatch',
-      label: 'Camp Dispatcher',
-      icon: <Bus className="w-5 h-5" />
-    },
-    {
-      id: 'broadcast',
-      label: 'Alert Broadcast Engine',
+      id: 'advisories',
+      label: 'Health Alerts & Advisories',
       icon: <Megaphone className="w-5 h-5" />
     },
     {
-      id: 'claims',
-      label: 'AWAZ Claim Settlement',
-      icon: <ShieldCheck className="w-5 h-5" />
+      id: 'camps',
+      label: 'Health Camps & Resources',
+      icon: <Bus className="w-5 h-5" />
+    },
+    {
+      id: 'operations',
+      label: 'Camp & Public Health Operations',
+      icon: <ClipboardList className="w-5 h-5" />
     }
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-slate-200 h-full flex flex-col shadow-sm">
-      <div className="p-5 border-b border-slate-100">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-          Command Center
+    <>
+    <div className="hidden md:flex md:w-[260px] lg:w-[280px] bg-gradient-to-b from-[#3934b1] via-[#5a52d9] to-[#8c85fa] fixed top-[92px] bottom-0 left-0 z-40 flex-col shadow-xl rounded-br-3xl text-white">
+      <div className="p-5 border-b border-white/10">
+        <h3 className="text-xs font-bold text-indigo-200 uppercase tracking-wider mb-1">
+          District Operations
         </h3>
-        <p className="text-sm font-semibold text-slate-900">
-          Govt of Kerala Health Cell
+        <p className="text-sm font-semibold text-white">
+          Public Health Portal
         </p>
       </div>
 
-      <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+      <nav className="flex-1 overflow-y-auto p-5 space-y-2">
         {navItems.map((item) => {
           return (
             <NavLink
@@ -53,8 +54,8 @@ export const AdminSidebar = () => {
               to={`/admin/${item.id}`}
               className={({ isActive }) => `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 isActive
-                  ? 'bg-rose-50 text-rose-800 shadow-sm border border-rose-100'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                  ? 'bg-white text-[#5a52d9] shadow-lg border border-white'
+                  : 'text-indigo-100 hover:bg-white/10 hover:text-white border border-transparent'
               }`}
             >
               {({ isActive }) => (
@@ -71,5 +72,9 @@ export const AdminSidebar = () => {
         })}
       </nav>
     </div>
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-2 py-2 flex justify-around">
+      {navItems.map(item => <NavLink key={item.id} to={`/admin/${item.id}`} className={({ isActive }) => `flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold ${isActive ? 'text-[#5a32fa] bg-indigo-50' : 'text-slate-500'}`}>{React.cloneElement(item.icon, { className: 'w-4 h-4' })}<span>{item.label.split(' ')[0]}</span></NavLink>)}
+    </nav>
+    </>
   );
 };
