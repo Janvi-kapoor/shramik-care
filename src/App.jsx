@@ -13,6 +13,7 @@ import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
 // Pages
 import { LandingAuthPage } from './pages/LandingAuthPage';
 import { WorkerDashboardPage } from './pages/WorkerDashboardPage';
+import { MedicalDiaryPage } from './pages/MedicalDiaryPage';
 import { DoctorWorkstationPage } from './pages/DoctorWorkstationPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
@@ -87,7 +88,7 @@ const MainContent = () => {
         {/* PUBLIC ROUTE: LANDING */}
         <Route path="/" element={
           activeSession ? (
-            <Navigate to={`/${activeSession.role === 'worker' ? 'worker/home' : activeSession.role === 'doctor' ? 'doctor/scanner' : 'admin/overview'}`} replace />
+            <Navigate to={`/${activeSession.role === 'worker' ? 'worker/health-id' : activeSession.role === 'doctor' ? 'doctor/scanner' : 'admin/overview'}`} replace />
           ) : (
             <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
               <LandingNavbar />
@@ -101,20 +102,14 @@ const MainContent = () => {
 
         {/* WORKER ROUTES */}
         <Route element={<ProtectedRoute allowedRole="worker" />}>
-          <Route path="/worker" element={
-            <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-teal-500 selection:text-white">
-              <AppHeader />
-              <main className="flex-1 pb-20">
-                <WorkerDashboardPage />
-              </main>
-            </div>
-          }>
-            <Route index element={<Navigate to="home" replace />} />
-            <Route path="home" element={<TabWelfareWallet />} /> {/* Using wallet as home temporarily, will refactor */}
-            <Route path="health-id" element={<TabHealthPassport />} />
-            <Route path="medicines" element={<TabAiScanner />} />
-            <Route path="care" element={<TabVoicePillClock />} />
-          </Route>
+            <Route path="/worker" element={<WorkerDashboardPage onReturnHome={() => {}} />}>
+              <Route index element={<Navigate to="health-id" replace />} />
+              <Route path="health-id" element={<TabHealthPassport />} />
+              <Route path="medicines" element={<TabAiScanner />} />
+              <Route path="voice-care" element={<TabVoicePillClock />} />
+              <Route path="schemes" element={<TabWelfareWallet />} />
+              <Route path="diary" element={<MedicalDiaryPage />} />
+            </Route>
         </Route>
 
         {/* DOCTOR ROUTES */}

@@ -280,27 +280,27 @@ export const AuthModal = () => {
         {/* Close Button */}
         <button
           onClick={closeAuthModal}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-100/90 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500"
+          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-100/90 hover:bg-slate-200 active:bg-slate-300 text-slate-600 hover:text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
           aria-label="Close Modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Top Banner */}
-        <div className="bg-gradient-to-r from-[#042F2E] via-[#0D5C52] to-[#064E3B] text-white p-5 sm:p-6 pb-4 sm:pb-5 relative flex-shrink-0">
-          <div className="flex items-center space-x-2 text-[11px] sm:text-xs font-bold text-amber-300 uppercase tracking-wider mb-1">
+        <div className="bg-gradient-to-r from-[#3a15cc] via-[#5a32fa] to-[#8c6dfd] text-white p-5 sm:p-6 pb-4 sm:pb-5 relative flex-shrink-0">
+          <div className="flex items-center space-x-2 text-[11px] sm:text-xs font-bold text-[#d6c9ff] uppercase tracking-wider mb-1">
             <ShieldCheck className="w-4 h-4" />
             <span>{t('authModalTitle')}</span>
           </div>
           <h2 className="text-lg sm:text-2xl font-extrabold text-white">
             {mode === 'register' ? t('wizardTitle') : t('portalLogin')}
           </h2>
-          <p className="text-xs text-teal-100/90 mt-1">
+          <p className="text-xs text-white/80 mt-1">
             {mode === 'register' ? t('wizardSubtitle') : t('authModalSubtitle')}
           </p>
 
           {/* Mode Switcher Tabs (Login vs 1-Minute Registration) */}
-          <div className="flex items-center space-x-2 mt-4 sm:mt-5 p-1 rounded-2xl bg-teal-950/50 border border-teal-700/40">
+          <div className="flex items-center space-x-2 mt-4 sm:mt-5 p-1 rounded-2xl bg-black/20 border border-white/10">
             <button
               onClick={() => {
                 setMode('login');
@@ -308,8 +308,8 @@ export const AuthModal = () => {
               }}
               className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                 mode === 'login'
-                  ? 'bg-white text-teal-950 shadow-md'
-                  : 'text-teal-200 hover:text-white'
+                  ? 'bg-white text-[#5a32fa] shadow-md'
+                  : 'text-white/70 hover:text-white'
               }`}
             >
               🔐 {t('portalLogin')}
@@ -323,8 +323,8 @@ export const AuthModal = () => {
               }}
               className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center space-x-1.5 ${
                 mode === 'register'
-                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-md font-black'
-                  : 'text-amber-300 hover:text-white'
+                  ? 'bg-white text-[#5a32fa] shadow-md font-black'
+                  : 'text-white/70 hover:text-white'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -358,11 +358,11 @@ export const AuthModal = () => {
                   }}
                   className={`flex items-center justify-center space-x-1 sm:space-x-1.5 py-2 sm:py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                     activeLoginRole === 'worker'
-                      ? 'bg-white text-teal-900 shadow-sm border border-slate-200/80'
+                      ? 'bg-white text-[#5a32fa] shadow-sm border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <HardHat className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <HardHat className={`w-4 h-4 flex-shrink-0 ${activeLoginRole === 'worker' ? 'text-[#5a32fa]' : 'text-slate-400'}`} />
                   <span className="truncate">{t('tabWorker')}</span>
                 </button>
 
@@ -374,11 +374,11 @@ export const AuthModal = () => {
                   }}
                   className={`flex items-center justify-center space-x-1 sm:space-x-1.5 py-2 sm:py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                     activeLoginRole === 'doctor'
-                      ? 'bg-white text-teal-900 shadow-sm border border-slate-200/80'
+                      ? 'bg-white text-[#5a32fa] shadow-sm border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Stethoscope className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                  <Stethoscope className={`w-4 h-4 flex-shrink-0 ${activeLoginRole === 'doctor' ? 'text-[#5a32fa]' : 'text-slate-400'}`} />
                   <span className="truncate">{t('tabDoctor')}</span>
                 </button>
 
@@ -390,11 +390,11 @@ export const AuthModal = () => {
                   }}
                   className={`flex items-center justify-center space-x-1 sm:space-x-1.5 py-2 sm:py-2.5 px-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                     activeLoginRole === 'admin'
-                      ? 'bg-white text-teal-900 shadow-sm border border-slate-200/80'
+                      ? 'bg-white text-[#5a32fa] shadow-sm border border-slate-200/80'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <Building2 className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <Building2 className={`w-4 h-4 flex-shrink-0 ${activeLoginRole === 'admin' ? 'text-[#5a32fa]' : 'text-slate-400'}`} />
                   <span className="truncate">{t('tabAdmin')}</span>
                 </button>
               </div>
@@ -408,14 +408,14 @@ export const AuthModal = () => {
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <Phone className="w-4 h-4 text-teal-700" />
+                        <Phone className="w-4 h-4 text-[#4922e0]" />
                       </div>
                       <input
                         type="text"
                         value={workerIdentifier}
                         onChange={(e) => setWorkerIdentifier(e.target.value)}
                         placeholder={t('inputWorkerMobilePlaceholder')}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold transition-all bg-white"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold transition-all bg-white"
                         autoFocus
                       />
                     </div>
@@ -425,13 +425,13 @@ export const AuthModal = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full py-3.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-sm shadow-md hover:shadow-lg transition-colors duration-200 active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer"
+                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd] hover:from-[#4922e0] hover:to-[#7b5cf5] active:from-[#3a15cc] active:to-[#6a4be3] text-white font-bold text-sm shadow-md hover:shadow-lg transition-colors duration-200 active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer"
                   >
                     {isLoading ? (
                       <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     ) : (
                       <>
-                        <ShieldCheck className="w-4 h-4 text-emerald-200" />
+                        <ShieldCheck className="w-4 h-4 text-[#eaddff]" />
                         <span>{t('btnWorkerLogin')}</span>
                       </>
                     )}
@@ -446,13 +446,13 @@ export const AuthModal = () => {
                       <button
                         type="button"
                         onClick={() => handleDemoWorker('KL-MIG-78219')}
-                        className="p-2.5 rounded-xl bg-slate-50 hover:bg-teal-50 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-left transition-colors duration-150 group"
+                        className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#f4efff] active:bg-[#eaddff] border border-slate-200 hover:border-[#c4b5fd] text-left transition-colors duration-150 group"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900 group-hover:text-teal-900">
+                          <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-900">
                             {t('btnDemoRamesh')}
                           </span>
-                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 transition-transform group-hover:translate-x-0.5" />
+                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4922e0] transition-transform group-hover:translate-x-0.5" />
                         </div>
                         <span className="text-[10px] text-slate-500 font-mono">
                           KL-MIG-78219 • Bihar
@@ -462,13 +462,13 @@ export const AuthModal = () => {
                       <button
                         type="button"
                         onClick={() => handleDemoWorker('KL-MIG-88412')}
-                        className="p-2.5 rounded-xl bg-slate-50 hover:bg-teal-50 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-left transition-colors duration-150 group"
+                        className="p-2.5 rounded-xl bg-slate-50 hover:bg-[#f4efff] active:bg-[#eaddff] border border-slate-200 hover:border-[#c4b5fd] text-left transition-colors duration-150 group"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900 group-hover:text-teal-900">
+                          <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-900">
                             {t('btnDemoBikash')}
                           </span>
-                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 transition-transform group-hover:translate-x-0.5" />
+                          <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4922e0] transition-transform group-hover:translate-x-0.5" />
                         </div>
                         <span className="text-[10px] text-slate-500 font-mono">
                           KL-MIG-88412 • West Bengal
@@ -491,7 +491,7 @@ export const AuthModal = () => {
                       value={doctorId}
                       onChange={(e) => setDoctorId(e.target.value)}
                       placeholder={t('inputDoctorIdPlaceholder')}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 font-mono text-sm font-semibold transition-all bg-white"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 font-mono text-sm font-semibold transition-all bg-white"
                     />
                   </div>
 
@@ -500,20 +500,20 @@ export const AuthModal = () => {
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                         {t('inputKmcLicense')}
                       </label>
-                      <span className="text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200">
+                      <span className="text-[10px] font-bold text-[#4922e0] bg-[#f4efff] px-2 py-0.5 rounded-md border border-indigo-200">
                         KMC Enforced
                       </span>
                     </div>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <Stethoscope className="w-4 h-4 text-teal-700" />
+                        <Stethoscope className="w-4 h-4 text-[#4922e0]" />
                       </div>
                       <input
                         type="text"
                         value={kmcLicense}
                         onChange={(e) => setKmcLicense(e.target.value)}
                         placeholder={t('inputKmcPlaceholder')}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 font-mono text-sm font-semibold transition-all uppercase bg-white"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 font-mono text-sm font-semibold transition-all uppercase bg-white"
                       />
                     </div>
                   </div>
@@ -521,13 +521,13 @@ export const AuthModal = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full py-3.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-sm shadow-md hover:shadow-lg transition-colors duration-200 active:scale-[0.99] flex items-center justify-center space-x-2"
+                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd] hover:from-[#4922e0] hover:to-[#7b5cf5] active:from-[#3a15cc] active:to-[#6a4be3] text-white font-bold text-sm shadow-md hover:shadow-lg transition-colors duration-200 active:scale-[0.99] flex items-center justify-center space-x-2"
                   >
                     {isLoading ? (
                       <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     ) : (
                       <>
-                        <ShieldCheck className="w-4 h-4 text-emerald-200" />
+                        <ShieldCheck className="w-4 h-4 text-[#eaddff]" />
                         <span>{t('btnDoctorLogin')}</span>
                       </>
                     )}
@@ -541,13 +541,13 @@ export const AuthModal = () => {
                     <button
                       type="button"
                       onClick={handleDemoDoctor}
-                      className="w-full p-3 rounded-xl bg-slate-50 hover:bg-teal-50 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-left transition-colors duration-150 group"
+                      className="w-full p-3 rounded-xl bg-slate-50 hover:bg-[#f4efff] active:bg-[#eaddff] border border-slate-200 hover:border-[#c4b5fd] text-left transition-colors duration-150 group"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 group-hover:text-teal-900">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-900">
                           {t('btnDemoDoctor')}
                         </span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 transition-transform group-hover:translate-x-0.5" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4922e0] transition-transform group-hover:translate-x-0.5" />
                       </div>
                       <span className="text-[10px] text-slate-500 font-mono">
                         DOC-ALUVA-01 • KMC-88214 (Aluva Taluk Hospital)
@@ -569,7 +569,7 @@ export const AuthModal = () => {
                       value={officerId}
                       onChange={(e) => setOfficerId(e.target.value)}
                       placeholder={t('inputOfficerIdPlaceholder')}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 font-mono text-sm font-semibold transition-all uppercase bg-white"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 font-mono text-sm font-semibold transition-all uppercase bg-white"
                     />
                   </div>
 
@@ -579,7 +579,7 @@ export const AuthModal = () => {
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <Lock className="w-4 h-4 text-amber-600" />
+                        <Lock className="w-4 h-4 text-[#5a32fa]" />
                       </div>
                       <input
                         type="password"
@@ -587,7 +587,7 @@ export const AuthModal = () => {
                         value={adminPin}
                         onChange={(e) => setAdminPin(e.target.value)}
                         placeholder={t('inputAdminPinPlaceholder')}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 font-mono text-sm font-semibold tracking-widest transition-all bg-white"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 font-mono text-sm font-semibold tracking-widest transition-all bg-white"
                       />
                     </div>
                   </div>
@@ -595,13 +595,13 @@ export const AuthModal = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-bold text-sm shadow-md hover:shadow-lg transition-colors duration-200 active:scale-[0.99] flex items-center justify-center space-x-2"
+                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#2a106b] to-[#45279b] hover:from-[#1d0852] hover:to-[#381a80] active:scale-95 text-white font-bold text-sm shadow-md hover:shadow-lg transition-colors duration-200 active:scale-[0.99] flex items-center justify-center space-x-2"
                   >
                     {isLoading ? (
                       <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     ) : (
                       <>
-                        <KeyRound className="w-4 h-4 text-amber-400" />
+                        <KeyRound className="w-4 h-4 text-indigo-400" />
                         <span>{t('btnAdminLogin')}</span>
                       </>
                     )}
@@ -615,13 +615,13 @@ export const AuthModal = () => {
                     <button
                       type="button"
                       onClick={handleDemoAdmin}
-                      className="w-full p-3 rounded-xl bg-slate-50 hover:bg-teal-50 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-left transition-colors duration-150 group"
+                      className="w-full p-3 rounded-xl bg-slate-50 hover:bg-[#f4efff] active:bg-[#eaddff] border border-slate-200 hover:border-[#c4b5fd] text-left transition-colors duration-150 group"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 group-hover:text-teal-900">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-indigo-900">
                           {t('btnDemoAdmin')}
                         </span>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 transition-transform group-hover:translate-x-0.5" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#4922e0] transition-transform group-hover:translate-x-0.5" />
                       </div>
                       <span className="text-[10px] text-slate-500 font-mono">
                         GOVT-ADMIN-01 • PIN: 1234 (District Labour Nodal)
@@ -640,9 +640,9 @@ export const AuthModal = () => {
             <div>
               {/* STEP 0: CAMP KIOSK SECURITY PIN GATE */}
               {wizardStep === 0 && (
-                <div className="p-4 sm:p-6 rounded-3xl bg-amber-50/70 border border-amber-200/90 shadow-sm space-y-4 animate-in fade-in duration-150">
+                <div className="p-4 sm:p-6 rounded-3xl bg-[#f4efff]/70 border border-indigo-200/90 shadow-sm space-y-4 animate-in fade-in duration-150">
                   <div className="flex items-start space-x-3.5">
-                    <div className="p-2.5 rounded-2xl bg-amber-500 text-slate-950 shadow-md">
+                    <div className="p-2.5 rounded-2xl bg-[#f4efff]0 text-slate-950 shadow-md">
                       <ShieldAlert className="w-6 h-6" />
                     </div>
                     <div>
@@ -661,7 +661,7 @@ export const AuthModal = () => {
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <Key className="w-4 h-4 text-amber-600" />
+                        <Key className="w-4 h-4 text-[#5a32fa]" />
                       </div>
                       <input
                         type="password"
@@ -669,7 +669,7 @@ export const AuthModal = () => {
                         value={kioskPin}
                         onChange={(e) => setKioskPin(e.target.value)}
                         placeholder={t('inputKioskPinPlaceholder')}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-amber-300 focus:border-amber-600 focus:ring-2 focus:ring-amber-500/20 text-slate-900 font-mono font-bold text-sm tracking-widest bg-white"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#c4b5fd] focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 font-mono font-bold text-sm tracking-widest bg-white"
                         autoFocus
                       />
                     </div>
@@ -679,7 +679,7 @@ export const AuthModal = () => {
                     <button
                       type="button"
                       onClick={() => handleUnlockKiosk()}
-                      className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                      className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd] hover:from-[#4922e0] hover:to-[#7b5cf5] active:from-[#3a15cc] active:to-[#6a4be3] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                     >
                       <Lock className="w-3.5 h-3.5" />
                       <span>{t('btnUnlockKiosk')}</span>
@@ -691,7 +691,7 @@ export const AuthModal = () => {
                         setKioskPin('1234');
                         handleUnlockKiosk('1234');
                       }}
-                      className="w-full sm:w-auto py-3 px-3.5 rounded-xl bg-amber-200/80 hover:bg-amber-300 active:bg-amber-400 text-slate-900 font-extrabold text-xs transition-colors duration-200 flex items-center justify-center space-x-1"
+                      className="w-full sm:w-auto py-3 px-3.5 rounded-xl bg-indigo-200/80 hover:bg-indigo-300 active:bg-indigo-400 text-slate-900 font-extrabold text-xs transition-colors duration-200 flex items-center justify-center space-x-1"
                     >
                       <span>{t('btnQuickKioskDemo')}</span>
                     </button>
@@ -703,16 +703,16 @@ export const AuthModal = () => {
               {wizardStep >= 1 && wizardStep <= 3 && (
                 <div className="mb-5 sm:mb-6">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-2">
-                    <span className="text-teal-900">
+                    <span className="text-indigo-900">
                       {t('stepOf')} {wizardStep} / 3: {
                         wizardStep === 1 ? t('step1Title') : wizardStep === 2 ? t('step2Title') : t('step3Title')
                       }
                     </span>
-                    <span className="font-mono text-teal-700">{Math.round((wizardStep / 3) * 100)}% Completed</span>
+                    <span className="font-mono text-[#4922e0]">{Math.round((wizardStep / 3) * 100)}% Completed</span>
                   </div>
                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-teal-500 to-amber-500 transition-all duration-300 rounded-full"
+                      className="h-full bg-gradient-to-r from-indigo-500 to-indigo-500 transition-all duration-300 rounded-full"
                       style={{ width: `${(wizardStep / 3) * 100}%` }}
                     ></div>
                   </div>
@@ -731,7 +731,7 @@ export const AuthModal = () => {
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder={t('fieldNamePlaceholder')}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       autoFocus
                     />
                   </div>
@@ -747,7 +747,7 @@ export const AuthModal = () => {
                         max="80"
                         value={formData.age}
                         onChange={(e) => handleInputChange('age', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       />
                     </div>
 
@@ -758,7 +758,7 @@ export const AuthModal = () => {
                       <select
                         value={formData.gender}
                         onChange={(e) => handleInputChange('gender', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       >
                         <option value="Male">{t('genderMale')}</option>
                         <option value="Female">{t('genderFemale')}</option>
@@ -775,7 +775,7 @@ export const AuthModal = () => {
                       <select
                         value={formData.originState}
                         onChange={(e) => handleInputChange('originState', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       >
                         {ORIGIN_STATES.map((st) => (
                           <option key={st} value={st}>{st}</option>
@@ -790,7 +790,7 @@ export const AuthModal = () => {
                       <select
                         value={formData.audioLanguage}
                         onChange={(e) => handleInputChange('audioLanguage', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       >
                         <option value="hi">हिंदी (Hindi)</option>
                         <option value="bn">বাংলা (Bengali)</option>
@@ -807,7 +807,7 @@ export const AuthModal = () => {
                     <button
                       type="button"
                       onClick={handleNextStep}
-                      className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-colors duration-200 cursor-pointer"
+                      className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd] hover:from-[#4922e0] hover:to-[#7b5cf5] active:from-[#3a15cc] active:to-[#6a4be3] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-colors duration-200 cursor-pointer"
                     >
                       <span>{t('stepNext')} 2</span>
                       <ArrowRight className="w-4 h-4 text-white" />
@@ -827,7 +827,7 @@ export const AuthModal = () => {
                       <select
                         value={formData.keralaDistrict}
                         onChange={(e) => handleInputChange('keralaDistrict', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       >
                         {KERALA_DISTRICTS.map((dist) => (
                           <option key={dist} value={dist}>{dist}</option>
@@ -842,7 +842,7 @@ export const AuthModal = () => {
                       <select
                         value={formData.bloodGroup}
                         onChange={(e) => handleInputChange('bloodGroup', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-bold text-rose-700 bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-bold text-rose-700 bg-white"
                       >
                         {BLOOD_GROUPS.map((bg) => (
                           <option key={bg} value={bg}>{bg}</option>
@@ -860,7 +860,7 @@ export const AuthModal = () => {
                       value={formData.worksite}
                       onChange={(e) => handleInputChange('worksite', e.target.value)}
                       placeholder={t('fieldWorksitePlaceholder')}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                     />
                   </div>
 
@@ -873,7 +873,7 @@ export const AuthModal = () => {
                       value={formData.mobile}
                       onChange={(e) => handleInputChange('mobile', e.target.value)}
                       placeholder={t('fieldMobilePlaceholder')}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold font-mono bg-white"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold font-mono bg-white"
                     />
                   </div>
 
@@ -887,7 +887,7 @@ export const AuthModal = () => {
                         value={formData.emergencyName}
                         onChange={(e) => handleInputChange('emergencyName', e.target.value)}
                         placeholder={t('fieldEmergencyNamePlaceholder')}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold bg-white"
                       />
                     </div>
 
@@ -900,7 +900,7 @@ export const AuthModal = () => {
                         value={formData.emergencyPhone}
                         onChange={(e) => handleInputChange('emergencyPhone', e.target.value)}
                         placeholder={t('fieldEmergencyPhonePlaceholder')}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 text-slate-900 text-sm font-semibold font-mono bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 text-sm font-semibold font-mono bg-white"
                       />
                     </div>
                   </div>
@@ -919,7 +919,7 @@ export const AuthModal = () => {
                     <button
                       type="button"
                       onClick={handleNextStep}
-                      className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-colors duration-200 cursor-pointer"
+                      className="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd] hover:from-[#4922e0] hover:to-[#7b5cf5] active:from-[#3a15cc] active:to-[#6a4be3] text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-colors duration-200 cursor-pointer"
                     >
                       <span>{t('stepNext')} 3</span>
                       <ArrowRight className="w-4 h-4 text-white" />
@@ -977,12 +977,12 @@ export const AuthModal = () => {
                             onClick={() => handleCheckboxToggle('conditions', cond)}
                             className={`p-2 rounded-xl text-left text-xs font-semibold border transition-all flex items-center space-x-2 ${
                               isChecked
-                                ? 'bg-teal-50 border-teal-300 text-teal-900 font-bold'
+                                ? 'bg-[#f4efff] border-[#c4b5fd] text-indigo-900 font-bold'
                                 : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                             }`}
                           >
                             <span className={`w-4 h-4 rounded-md border flex items-center justify-center ${
-                              isChecked ? 'bg-teal-700 border-teal-700 text-white font-bold' : 'border-slate-300 bg-white'
+                              isChecked ? 'bg-indigo-700 border-indigo-700 text-white font-bold' : 'border-slate-300 bg-white'
                             }`}>
                               {isChecked && '✓'}
                             </span>
@@ -994,12 +994,12 @@ export const AuthModal = () => {
                   </div>
 
                   {/* 14-Digit ABHA ID Auto-Generator Section */}
-                  <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/90 shadow-sm">
+                  <div className="p-4 rounded-2xl bg-[#f4efff]/80 border border-indigo-200/90 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-indigo-900 uppercase tracking-wider">
                         {t('fieldAbhaId')}
                       </span>
-                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-[#4922e0] bg-[#eaddff] px-2 py-0.5 rounded-full">
                         ABDM Sandbox
                       </span>
                     </div>
@@ -1010,13 +1010,13 @@ export const AuthModal = () => {
                         value={formData.abhaId}
                         onChange={(e) => handleInputChange('abhaId', e.target.value)}
                         placeholder={t('fieldAbhaPlaceholder')}
-                        className="flex-1 px-3 sm:px-4 py-2.5 rounded-xl border border-amber-300 bg-white text-slate-900 font-mono font-bold text-xs sm:text-sm tracking-wider"
+                        className="flex-1 px-3 sm:px-4 py-2.5 rounded-xl border border-[#c4b5fd] bg-white text-slate-900 font-mono font-bold text-xs sm:text-sm tracking-wider"
                       />
 
                       <button
                         type="button"
                         onClick={handleGenerateAbha}
-                        className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 active:from-amber-700 active:to-amber-800 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm flex items-center space-x-1.5 transition-colors active:scale-95"
+                        className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:from-indigo-700 active:to-indigo-800 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm flex items-center space-x-1.5 transition-colors active:scale-95"
                       >
                         <Zap className="w-3.5 h-3.5 fill-current" />
                         <span className="hidden sm:inline">Auto-Gen</span>
@@ -1024,7 +1024,7 @@ export const AuthModal = () => {
                     </div>
 
                     {formData.abhaId && (
-                      <span className="text-[11px] text-emerald-700 font-bold mt-2 flex items-center space-x-1">
+                      <span className="text-[11px] text-[#5a32fa] font-bold mt-2 flex items-center space-x-1">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>{t('abhaGeneratedNotice')}</span>
                       </span>
@@ -1044,13 +1044,13 @@ export const AuthModal = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="inline-flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-black text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition-colors duration-200 active:scale-95 cursor-pointer"
+                      className="inline-flex items-center space-x-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#5a32fa] to-[#8c6dfd] hover:from-[#4922e0] hover:to-[#7b5cf5] active:from-[#3a15cc] active:to-[#6a4be3] text-white font-black text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition-colors duration-200 active:scale-95 cursor-pointer"
                     >
                       {isLoading ? (
                         <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                       ) : (
                         <>
-                          <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                          <CheckCircle2 className="w-4 h-4 text-[#eaddff]" />
                           <span>{t('stepSubmit')}</span>
                         </>
                       )}
@@ -1063,7 +1063,7 @@ export const AuthModal = () => {
               {wizardStep === 4 && newlyCreatedWorker && (
                 <div className="space-y-5 animate-in zoom-in-95 duration-200">
                   <div className="text-center">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2.5 shadow-inner">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#eaddff] text-[#5a32fa] flex items-center justify-center mx-auto mb-2.5 shadow-inner">
                       <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" />
                     </div>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">
@@ -1108,7 +1108,7 @@ export const AuthModal = () => {
                         });
                         setNewlyCreatedWorker(null);
                       }}
-                      className="text-xs font-bold text-teal-700 hover:text-teal-900 underline"
+                      className="text-xs font-bold text-[#4922e0] hover:text-indigo-900 underline"
                     >
                       + {t('btnEnrollAnother')}
                     </button>

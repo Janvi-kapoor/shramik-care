@@ -172,7 +172,7 @@ export const DoctorPatientLookup = () => {
                       {rx.doctorName} {rx.doctorId !== 'DOC-UNKNOWN' ? `(${rx.doctorId})` : ''}
                     </span>
                     <span className="text-slate-400 font-mono text-[10px]">
-                      {new Date(rx.timestamp).toLocaleDateString()}
+                      {new Date(rx.timestamp || rx.date).toLocaleDateString()}
                     </span>
                   </div>
                   {rx.diagnosis && (

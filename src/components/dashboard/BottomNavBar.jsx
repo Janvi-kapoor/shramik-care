@@ -5,7 +5,9 @@ import {
   Home, 
   QrCode, 
   Pill, 
-  Heart
+  Heart,
+  Clock,
+  ShieldCheck
 } from 'lucide-react';
 
 export const BottomNavBar = () => {
@@ -13,33 +15,28 @@ export const BottomNavBar = () => {
 
   const tabs = [
     {
-      id: 'home',
-      label: 'Home',
-      icon: Home,
-      activeColor: 'text-indigo-900 bg-indigo-50 border-indigo-200/80',
-      activeDot: 'bg-indigo-600',
-    },
-    {
       id: 'health-id',
-      label: 'Health ID',
+      label: 'My Health ID',
       icon: QrCode,
       activeColor: 'text-teal-800 bg-teal-50 border-teal-200/80',
-      activeDot: 'bg-teal-600',
     },
     {
       id: 'medicines',
-      label: 'Medicines',
+      label: 'My Medicines',
       icon: Pill,
-      badge: 'AI Rx',
-      activeColor: 'text-amber-900 bg-amber-50 border-amber-300',
-      activeDot: 'bg-amber-500',
+      activeColor: 'text-teal-800 bg-teal-50 border-teal-200/80',
     },
     {
-      id: 'care',
-      label: 'Care',
-      icon: Heart,
-      activeColor: 'text-emerald-900 bg-emerald-50 border-emerald-300',
-      activeDot: 'bg-emerald-600',
+      id: 'voice-care',
+      label: 'Voice Care',
+      icon: Clock,
+      activeColor: 'text-teal-800 bg-teal-50 border-teal-200/80',
+    },
+    {
+      id: 'schemes',
+      label: 'Schemes & Benefits',
+      icon: ShieldCheck,
+      activeColor: 'text-teal-800 bg-teal-50 border-teal-200/80',
     },
   ];
 

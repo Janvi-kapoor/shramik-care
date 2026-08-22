@@ -1,180 +1,206 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Volume2, 
-  VolumeX, 
-  CheckCircle2, 
-  Clock, 
-  Sparkles, 
-  Check,
-  AlertCircle
+  ChevronDown,
+  Navigation,
+  PhoneCall,
+  Sun,
+  Moon,
+  Sunset
 } from 'lucide-react';
+import { EMPANELLED_HOSPITALS } from '../../data/mockDatabase';
 
 export const TabVoicePillClock = () => {
-  const { 
-    currentLanguage, 
-    t, 
-    activeSession,
-    pillAdherence, 
-    togglePillSlotTaken, 
-    speakText, 
-    stopSpeech, 
-    isAudioSpeaking, 
-    currentlyPlayingSlot,
-    showToast 
-  } = useApp();
+  const { activeSession, speakText, isAudioSpeaking, t, getSavedPrescriptionsForWorker } = useApp();
+  const [selectedLang, setSelectedLang] = useState('hi');
+  const [hospitalFilter, setHospitalFilter] = useState('All');
+  
+  const worker = activeSession?.user;
+  const saved = getSavedPrescriptionsForWorker ? getSavedPrescriptionsForWorker(worker?.id) : [];
+  const latestPrescription = saved.length > 0 ? saved[0] : null;
 
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPrescriptions = async () => {
-      if (!activeSession?.user?.id) return;
-      try {
-        const res = await fetch(`http://localhost:5000/api/workers/${activeSession.user.id}/prescriptions`);
-        if (res.ok) {
-          const data = await res.json();
-          setPrescriptions(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch real prescriptions:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPrescriptions();
-  }, [activeSession]);
-
-  const handlePlayMedicineAudio = (med, prescriptionId) => {
-    const medId = `${prescriptionId}-${med.id}`;
-    if (isAudioSpeaking && currentlyPlayingSlot === medId) {
-      stopSpeech();
-      return;
+  const handleListen = () => {
+    let text = "";
+    if (!latestPrescription || !latestPrescription.medicines || latestPrescription.medicines.length === 0) {
+      text = "You do not have any active medicines right now.";
+    } else {
+      const medsList = latestPrescription.medicines.map(m => `${m.name}, ${m.dosage}, ${m.frequency}`).join(". ");
+      text = `Your diagnosis is ${latestPrescription.diagnosis || 'unknown'}. You have ${latestPrescription.medicines.length} medicines to take. They are: ${medsList}. Please take your medicine on time.`;
     }
-    const textToSpeak = `${med.name}. ${med.instructions || med.dosage}`;
-    speakText(textToSpeak, medId);
+    if (speakText) speakText(text, 'voice-care', selectedLang, false);
   };
 
-  const handleToggleTaken = (medId, medName) => {
-    togglePillSlotTaken(medId);
-    if (!pillAdherence[medId]) {
-      showToast(`Marked ${medName} as taken!`, 'success');
-    }
-  };
+  // Hospital Filtering
+  const filteredHospitals = EMPANELLED_HOSPITALS.filter(h => {
+    if (hospitalFilter === 'All') return true;
+    if (hospitalFilter === 'Hospitals' && h.type.includes('Hospital')) return true;
+    if (hospitalFilter === 'Clinics' && h.type.includes('Clinic')) return true;
+    if (hospitalFilter === 'Govt.' && (h.type.includes('Govt') || h.type.includes('Primary Health'))) return true;
+    return false;
+  }).slice(0, 3);
 
-  if (loading) {
-    return <div className="p-8 text-center text-slate-500 font-bold animate-pulse">Loading Voice Guidance...</div>;
-  }
-
-  if (prescriptions.length === 0) {
+  // Frequency icons parsing
+  const getFreqIcons = (freq = "") => {
+    const parts = freq.split('-');
     return (
-      <div className="p-8 text-center text-slate-500 flex flex-col items-center">
-        <AlertCircle className="w-12 h-12 text-slate-300 mb-3" />
-        <p className="font-bold">No prescriptions found.</p>
-        <p className="text-sm mt-1">Upload a prescription via the Medicines tab.</p>
+      <div className="flex space-x-2 text-slate-400">
+        {parts[0] && parts[0] !== '0' && <Sun className="w-4 h-4 text-amber-500" />}
+        {parts[1] && parts[1] !== '0' && <Sunset className="w-4 h-4 text-orange-500" />}
+        {parts[2] && parts[2] !== '0' && <Moon className="w-4 h-4 text-indigo-500" />}
       </div>
     );
-  }
+  };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 text-xs font-bold uppercase tracking-wider mb-1">
-            <Volume2 className="w-3.5 h-3.5" />
-            <span>Native Voice Audio Guidance</span>
-          </div>
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900">
-            {t('pillClockTitle') || "Voice Pill Clock"}
-          </h2>
-          <p className="text-xs md:text-sm text-slate-500 mt-0.5">
-            {t('pillClockSub') || "Audio guidance for your scanned prescriptions"}
-          </p>
-        </div>
+    <div className="animate-in fade-in duration-200 grid grid-cols-1 xl:grid-cols-2 gap-6">
+      
+      {/* Left: Voice Care */}
+      <div className="space-y-6 flex flex-col">
+         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{t('wpVoiceCare', 'Medicine Voice')}</h3>
+                <p className="text-sm text-slate-500">Listen to your medicine instructions.</p>
+              </div>
+              
+              <div className="relative">
+                <select 
+                  value={selectedLang} 
+                  onChange={(e) => setSelectedLang(e.target.value)}
+                  className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-10 text-sm font-bold text-[#5a32fa] focus:outline-none focus:border-[#5a32fa]"
+                >
+                  <option value="hi">Hindi</option>
+                  <option value="ml">Malayalam</option>
+                  <option value="bn">Bengali</option>
+                  <option value="en">English</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-[#5a32fa] pointer-events-none" />
+              </div>
+            </div>
+
+            <div className="border border-slate-100 rounded-xl p-5 mb-6 bg-slate-50/50">
+               <div className="flex justify-between items-center mb-4">
+                 <h4 className="text-xs font-bold text-slate-500 uppercase">Current Prescription</h4>
+                 <span className="text-xs font-semibold text-slate-900 bg-white px-2 py-1 rounded-md border border-slate-100 shadow-sm">
+                   {latestPrescription ? (
+                     new Date(latestPrescription.date || latestPrescription.timestamp).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) !== 'Invalid Date' 
+                       ? new Date(latestPrescription.date || latestPrescription.timestamp).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
+                       : "Recent"
+                   ) : "None"}
+                 </span>
+               </div>
+               
+               <div className="mb-4 bg-white p-3 rounded-lg border border-slate-100">
+                 <p className="text-[10px] text-slate-400 uppercase mb-1">Diagnosis</p>
+                 <p className="text-sm font-bold text-slate-900">{latestPrescription?.diagnosis || "No diagnosis saved"}</p>
+               </div>
+               
+               <div>
+                 <p className="text-[10px] text-slate-400 uppercase mb-2">Medicines</p>
+                 <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
+                   {latestPrescription && latestPrescription.medicines && latestPrescription.medicines.length > 0 ? (
+                     latestPrescription.medicines.map((m, i) => (
+                       <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-100">
+                         <div>
+                           <p className="text-xs font-bold text-slate-900">{m.name}</p>
+                           <p className="text-[10px] text-slate-500">{m.dosage} • {m.frequency}</p>
+                         </div>
+                         {getFreqIcons(m.frequency)}
+                       </div>
+                     ))
+                   ) : (
+                     <div className="text-xs font-semibold text-slate-400 p-3 text-center border border-dashed border-slate-200 rounded-lg">
+                       No medicines active.
+                     </div>
+                   )}
+                 </div>
+               </div>
+            </div>
+
+            <button 
+              onClick={handleListen}
+              disabled={isAudioSpeaking || (!latestPrescription || !latestPrescription.medicines?.length)}
+              className="w-full py-3.5 px-4 bg-[#5a32fa] hover:bg-[#4825cc] text-white rounded-xl font-bold flex items-center justify-center space-x-2 transition-all shadow-md active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+               {isAudioSpeaking ? (
+                  <div className="flex space-x-1">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                ) : (
+                  <>
+                    <Volume2 className="w-5 h-5" />
+                    <span>
+                      Listen in {selectedLang === 'hi' ? 'Hindi' : selectedLang === 'ml' ? 'Malayalam' : selectedLang === 'bn' ? 'Bengali' : 'English'}
+                    </span>
+                  </>
+                )}
+            </button>
+         </div>
       </div>
 
-      <div className="space-y-8">
-        {prescriptions.map((prescription) => (
-          <div key={prescription.id} className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-5 h-5 text-blue-600" />
-                <h3 className="font-bold text-slate-900 text-lg">
-                  Prescription Scanned at {new Date(prescription.timestamp || prescription.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </h3>
-              </div>
-              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                Dr. {prescription.doctorName || 'Unknown'}
-              </span>
-            </div>
+      {/* Right: Care Near You */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col">
+         <h3 className="text-lg font-bold text-slate-900 mb-1">{t('wpCareNearYou', 'Care Near You')}</h3>
+         <p className="text-sm text-slate-500 mb-6">Nearby verified healthcare facilities</p>
+         
+         <div className="flex space-x-2 mb-6 overflow-x-auto pb-2 custom-scrollbar">
+            {['All', 'Hospitals', 'Clinics', 'Govt.'].map(filter => (
+              <button 
+                key={filter}
+                onClick={() => setHospitalFilter(filter)}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${
+                  hospitalFilter === filter 
+                    ? 'bg-indigo-50 text-[#5a32fa] border border-indigo-100' 
+                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+         </div>
 
-            {prescription.diagnosis && prescription.diagnosis.trim() !== '' && prescription.diagnosis.toLowerCase() !== 'none' && (
-              <div className="mb-4 bg-rose-50 border border-rose-100 rounded-lg p-3">
-                <p className="text-xs font-bold text-rose-800 uppercase tracking-wider mb-1">Diagnosis / Doctor's Note</p>
-                <p className="text-sm text-slate-900 font-semibold">{prescription.diagnosis}</p>
+         <div className="space-y-4 flex-1">
+            {filteredHospitals.map((hospital, i) => (
+              <div key={i} className="flex flex-col sm:flex-row justify-between sm:items-center py-3 border-b border-slate-100 last:border-0">
+                 <div className="mb-3 sm:mb-0">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <h4 className="font-bold text-slate-900 text-sm">{hospital.name}</h4>
+                      {(hospital.type.includes('AWAZ') || hospital.type.includes('Govt')) && (
+                        <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 text-[9px] font-bold rounded-sm uppercase tracking-wider">AWAZ</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500">{hospital.type}</p>
+                 </div>
+                 <div className="flex items-center space-x-4">
+                    <span className="text-xs font-bold text-slate-400 w-12 text-right">{hospital.distance}</span>
+                    <div className="flex space-x-2">
+                       <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hospital.name + ' ' + hospital.address)}`} target="_blank" rel="noreferrer" className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-slate-200 text-[#5a32fa] text-xs font-semibold hover:bg-indigo-50 transition-colors">
+                         <Navigation className="w-3.5 h-3.5" />
+                         <span className="hidden sm:inline">Map</span>
+                       </a>
+                       <button className="flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-slate-200 text-[#5a32fa] text-xs font-semibold hover:bg-indigo-50 transition-colors">
+                         <PhoneCall className="w-3.5 h-3.5" />
+                         <span className="hidden sm:inline">Call</span>
+                       </button>
+                    </div>
+                 </div>
+              </div>
+            ))}
+            {filteredHospitals.length === 0 && (
+              <div className="text-center text-sm text-slate-400 py-6">
+                No facilities found for this filter.
               </div>
             )}
+         </div>
 
-            <div className="space-y-3">
-              {prescription.medicines?.map((med) => {
-                const medId = `${prescription.id}-${med.id}`;
-                const isTaken = pillAdherence[medId];
-                const isPlayingThis = isAudioSpeaking && currentlyPlayingSlot === medId;
-                
-                // Determine background color based on instructions vaguely
-                const isMorning = med.instructions?.toLowerCase().includes('morning') || med.frequency?.startsWith('1-');
-                const isEvening = med.instructions?.toLowerCase().includes('night') || med.instructions?.toLowerCase().includes('evening') || med.frequency?.endsWith('-1');
-                
-                const bgColor = isMorning ? 'bg-blue-50' : isEvening ? 'bg-orange-50' : 'bg-slate-50';
-
-                return (
-                  <div key={med.id} className={`p-4 rounded-xl border-y border-r border-l-4 border-l-blue-600 border-y-slate-200 border-r-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${bgColor} ${isTaken ? 'opacity-70' : ''} ${isPlayingThis ? 'ring-2 ring-amber-400' : ''}`}>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between md:justify-start gap-3">
-                        <h4 className="text-xl font-black text-slate-900">{med.name}</h4>
-                        <span className="text-[10px] font-bold text-slate-600 border border-slate-300 bg-white px-2 py-1 rounded uppercase">{med.frequency || 'Daily'}</span>
-                      </div>
-                      <p className="text-sm font-semibold text-slate-700 mt-1">
-                        {med.instructions || `${med.dosage} ${med.strength ? `(${med.strength})` : ''}`}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Duration: {med.duration || 'As prescribed'}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handlePlayMedicineAudio(med, prescription.id)}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
-                          isPlayingThis
-                            ? 'bg-amber-400 text-slate-900 animate-pulse'
-                            : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'
-                        }`}
-                      >
-                        {isPlayingThis ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-teal-700" />}
-                        <span>{isPlayingThis ? 'Stop' : 'Listen'}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleToggleTaken(medId, med.name)}
-                        className={`px-4 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all ${
-                          isTaken
-                            ? 'bg-emerald-600 text-white'
-                            : 'bg-slate-900 text-white hover:bg-slate-800'
-                        }`}
-                      >
-                        <Check className="w-5 h-5" />
-                        <span>{isTaken ? 'Taken' : 'Mark Taken'}</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+         <div className="mt-6 text-center border-t border-slate-100 pt-4">
+            <button className="text-sm font-bold text-[#5a32fa] hover:text-[#4825cc] transition-colors flex items-center justify-center w-full">
+              View More Places <ChevronDown className="w-4 h-4 ml-1 -rotate-90" />
+            </button>
+         </div>
       </div>
     </div>
   );

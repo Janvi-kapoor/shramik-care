@@ -50,6 +50,18 @@ export const AppProvider = ({ children }) => {
   const [isHospitalModalOpen, setIsHospitalModalOpen] = useState(false);
   const [isJanAushadhiModalOpen, setIsJanAushadhiModalOpen] = useState(false);
   const [activePrescription, setActivePrescription] = useState(MOCK_PRESCRIPTION_SCANS[0]);
+  const [savedPrescriptions, setSavedPrescriptions] = useState([]);
+
+  useEffect(() => {
+    if (activeSession && activeSession.role === 'worker' && activeSession.user?.id) {
+      fetch(`http://localhost:5000/api/workers/${activeSession.user.id}/prescriptions`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setSavedPrescriptions(data);
+        })
+        .catch(err => console.error("Error fetching worker prescriptions:", err));
+    }
+  }, [activeSession]);
   
   // Daily Pill Adherence Checklist State
   const [pillAdherence, setPillAdherence] = useState(() => {
@@ -296,146 +308,144 @@ export const AppProvider = ({ children }) => {
 
   // Flawless Multilingual Speech Engine (Bengali, Malayalam, Hindi, English)
   const speakText = async (text, slotId = null, forcedLang = null, skipTranslation = false) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      showToast('Speech synthesis not supported on this browser.', 'error');
-      return;
-    }
-
-    // 1. Mandatory cancel before speaking to prevent audio queue overlap
-    window.speechSynthesis.cancel();
-
     if (!text || text.trim() === '') return;
+    
+    setIsAudioSpeaking(true);
+    setCurrentlyPlayingSlot(slotId || 'all');
 
-    // 2. Strict BCP-47 mapping
     const langCodeMap = {
-      hi: 'hi-IN',
-      bn: 'bn-IN',
-      ml: 'ml-IN',
-      or: 'or-IN',
-      en: 'en-IN'
+      hi: 'hi',
+      bn: 'bn',
+      ml: 'ml',
+      or: 'or',
+      en: 'en'
     };
     
-    // If forcedLang is already a full tag (e.g. 'ml-IN'), extract the base ('ml')
     let baseLang = (forcedLang || currentLanguage).split('-')[0];
-    const targetLangTag = langCodeMap[baseLang] || 'en-IN';
-    const targetLangCode = baseLang; // 'hi', 'bn', 'ml', 'en'
+    const targetLangCode = langCodeMap[baseLang] || 'en';
 
-    // 3. API Translation or Offline Fallback
     let textToSpeak = text;
     
     if (!skipTranslation && targetLangCode !== 'en') {
       const cleanText = text.trim();
-      if (fallbackTranslations[cleanText] && fallbackTranslations[cleanText][targetLangTag]) {
-        textToSpeak = fallbackTranslations[cleanText][targetLangTag];
-        setIsAudioSpeaking(true);
-        setCurrentlyPlayingSlot(slotId || 'all');
+      if (fallbackTranslations[cleanText] && fallbackTranslations[cleanText][targetLangCode+'-IN']) {
+        textToSpeak = fallbackTranslations[cleanText][targetLangCode+'-IN'];
       } else {
         try {
-          // HACK: Unlock speech synthesis in this call stack before awaiting fetch
-        const silentUtterance = new SpeechSynthesisUtterance('');
-        silentUtterance.volume = 0;
-        window.speechSynthesis.speak(silentUtterance);
+          const res = await fetch('http://localhost:5000/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, targetLangCode })
+          });
+          const data = await res.json();
+          if (data.success && data.translatedText) {
+            textToSpeak = data.translatedText;
+          }
+        } catch (err) {
+          console.warn('Failed to translate text:', err);
+        }
+      }
+    }
 
-        setIsAudioSpeaking(true);
-        setCurrentlyPlayingSlot(slotId || 'all');
+    try {
+      // Chunking for translate_tts (max 200 chars per request)
+      const words = textToSpeak.split(' ');
+      let chunks = [];
+      let currentChunk = '';
+      for (const word of words) {
+        if ((currentChunk + ' ' + word).length > 150) {
+          chunks.push(currentChunk);
+          currentChunk = word;
+        } else {
+          currentChunk = currentChunk ? currentChunk + ' ' + word : word;
+        }
+      }
+      if (currentChunk) chunks.push(currentChunk);
+
+      const playNext = (index) => {
+        if (index >= chunks.length) {
+          setIsAudioSpeaking(false);
+          setCurrentlyPlayingSlot(null);
+          return;
+        }
         
-        const res = await fetch('http://localhost:5000/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, targetLangCode })
+        const url = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(chunks[index]) + '&tl=' + targetLangCode + '&client=tw-ob';
+        const audio = new Audio(url);
+        
+        // Expose global so we can stop it
+        window.__currentAudio = audio;
+        
+        audio.onended = () => playNext(index + 1);
+        audio.onerror = () => {
+          console.warn('Failed to play chunk.');
+          setIsAudioSpeaking(false);
+          setCurrentlyPlayingSlot(null);
+        };
+        audio.play().catch(e => {
+          console.warn('Audio play blocked:', e);
+          setIsAudioSpeaking(false);
+          setCurrentlyPlayingSlot(null);
         });
-        const data = await res.json();
-        if (data.success && data.translatedText) {
-          textToSpeak = data.translatedText;
-        }
-      } catch (err) {
-        console.warn('Failed to translate text via API before speaking:', err);
+      };
+      
+      if (window.__currentAudio) {
+        window.__currentAudio.pause();
       }
-    }
-  }
-
-    // Workaround for browser async speech synthesis blocking
-    // After an await, sometimes speech synthesis is blocked if no prior interaction
-    // We will still attempt to speak.
-    
-    // 4. Configure Utterance
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = targetLangTag;
-    utterance.rate = 0.88;
-    utterance.pitch = 1.0;
-
-    // 5. Loop through available browser voices to find exact matching language voice
-    const voices = window.speechSynthesis.getVoices();
-    let exactVoice = null;
-    for (let i = 0; i < voices.length; i++) {
-      const v = voices[i];
-      const vLang = v.lang.toLowerCase();
-        if (targetLangTag === 'bn-IN' && (vLang.includes('bn') || vLang.includes('bengali'))) {
-          exactVoice = v;
-          break;
-        }
-        if (targetLangTag === 'ml-IN' && (vLang.includes('ml') || vLang.includes('malayalam'))) {
-          exactVoice = v;
-          break;
-        }
-        if (targetLangTag === 'or-IN' && (vLang.includes('or') || vLang.includes('odia') || vLang.includes('oriya'))) {
-          exactVoice = v;
-          break;
-        }
-        if (targetLangTag === 'hi-IN' && (vLang.includes('hi') || vLang.includes('hindi'))) {
-          exactVoice = v;
-          break;
-        }
-      if (targetLangTag === 'en-IN' && (vLang.includes('en-in') || vLang.includes('english'))) {
-        exactVoice = v;
-        break;
-      }
-    }
-
-    // 6. Synthetic Fallback Tone
-    if (!exactVoice) {
-       const primaryLang = targetLangTag.split('-')[0].toLowerCase();
-       exactVoice = voices.find(v => v.lang.toLowerCase().startsWith(primaryLang));
-       
-       if (!exactVoice) {
-         utterance.pitch = 0.8;
-         utterance.rate = 0.8;
-         exactVoice = voices.find(v => v.default) || voices[0];
-         console.warn(`[Speech Engine] Missing native voice pack for ${targetLangTag}.`);
-       }
-    }
-
-    if (exactVoice) {
-      utterance.voice = exactVoice;
-    }
-
-    // 7. UI Feedback event handlers
-    utterance.onstart = () => {
-      setIsAudioSpeaking(true);
-      setCurrentlyPlayingSlot(slotId || 'all');
-    };
-
-    utterance.onend = () => {
+      playNext(0);
+      
+    } catch (e) {
+      console.error(e);
       setIsAudioSpeaking(false);
       setCurrentlyPlayingSlot(null);
-    };
-
-    utterance.onerror = (e) => {
-      console.warn('SpeechSynthesis error:', e);
-      setIsAudioSpeaking(false);
-      setCurrentlyPlayingSlot(null);
-    };
-
-    // 8. Speak
-    window.speechSynthesis.speak(utterance);
+    }
   };
 
-  const stopSpeech = () => {
+  const stopSpeech = () => { if (window.__currentAudio) { window.__currentAudio.pause(); window.__currentAudio = null; } 
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       setIsAudioSpeaking(false);
       setCurrentlyPlayingSlot(null);
     }
+  };
+
+  const saveWorkerPrescription = async (workerId, prescriptionData) => {
+    console.log("Saving prescription for worker:", workerId, prescriptionData);
+    const newRecord = {
+      doctorName: "Dr. Anjali Menon",
+      date: new Date().toISOString(),
+      diagnosis: prescriptionData.diagnosis,
+      medicines: prescriptionData.medicines
+    };
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/workers/${workerId}/prescriptions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRecord)
+      });
+      if (!res.ok) throw new Error("Failed to save to backend");
+      
+      const data = await res.json();
+      const finalRecord = { id: data.prescriptionId || `PRES-${Date.now()}`, workerId, ...newRecord };
+      setSavedPrescriptions(prev => [finalRecord, ...prev]);
+    } catch (err) {
+      console.error(err);
+      // Fallback for local UI updates even if backend fails
+      setSavedPrescriptions(prev => [{id: `PRES-${Date.now()}`, workerId, ...newRecord}, ...prev]);
+    }
+  };
+
+  const getMedicinesForWorker = (workerId) => {
+    const records = savedPrescriptions.filter(p => p.workerId === workerId);
+    if (records.length > 0) {
+      return records[0].medicines;
+    }
+    // Fallback to activePrescription if nothing saved yet
+    return activePrescription?.medicines || [];
+  };
+
+  const getSavedPrescriptionsForWorker = (workerId) => {
+    return savedPrescriptions.filter(p => p.workerId === workerId);
   };
 
   return (
@@ -474,7 +484,10 @@ export const AppProvider = ({ children }) => {
         speakText,
         stopSpeech,
         isAudioSpeaking,
-        currentlyPlayingSlot
+        currentlyPlayingSlot,
+        saveWorkerPrescription,
+        getMedicinesForWorker,
+        getSavedPrescriptionsForWorker
       }}
     >
       {children}
